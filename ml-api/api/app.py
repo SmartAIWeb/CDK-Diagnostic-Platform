@@ -15,6 +15,10 @@ def reordering_features(user_info):
     # Reordering the features to match the training order
     return [user_info[col] for col in FEATURE_ORDER]
 
+@app.route('/')
+def home():
+    return "ML API is running!"
+
 @app.route("/predict", methods=['POST'])
 def predict():
     try:
