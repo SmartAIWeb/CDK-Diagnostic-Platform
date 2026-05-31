@@ -35,11 +35,6 @@ public class ControllerServlet extends HttpServlet {
     }
   }
 
-  private void render(HttpServletRequest req, HttpServletResponse res, String jspPage) 
-            throws ServletException, IOException {
-        req.getRequestDispatcher("/JSP/" + jspPage).forward(req, res);
-    }
-
   public void doGet(HttpServletRequest req, HttpServletResponse res) 
       throws ServletException, IOException {
 
@@ -58,6 +53,7 @@ public class ControllerServlet extends HttpServlet {
       } else if("logout".equals(requestType)) {
         rd = handleLogout(req, res);
       } else {
+        rd = req.getRequestDispatcher("/JSP/error.jsp");
         req.setAttribute("error_msg", "Unsupported Request Type");
       }
       
@@ -82,6 +78,7 @@ public class ControllerServlet extends HttpServlet {
       } else if("edit_info".equals(requestType)) {
         rd = handleEditUserProfile(req, res);
       } else {
+        rd = req.getRequestDispatcher("/JSP/error.jsp");
         req.setAttribute("error_msg", "Unsupported Request Type");
       }
 
@@ -92,8 +89,8 @@ public class ControllerServlet extends HttpServlet {
       rd.forward(req, res);
   }
 
-  private void handleRegistering(HttpServletRequest req , HttpServletResponse res) 
-      throws SQLException , ServletException, IOException {
+  RequestDispatcher handleRegistering(HttpServletRequest req , HttpServletResponse res) 
+      throws SQLException {
     User newUser = parseUserInfo(req);
     newUser = db.registerNewUser(newUser);
     if(newUser != null) {
@@ -102,15 +99,15 @@ public class ControllerServlet extends HttpServlet {
       loggedInUsers.put(sessionToken, newUser);
       res.addCookie(createSessionTokenCookie(sessionToken));
       req.setAttribute("user_info", newUser);
-      render(req,res,"profile.jsp");
+      return req.getRequestDispatcher("/JSP/profile.jsp");
     } else {
       req.setAttribute("error_msg", "Email already linked to an account");
-      render(req,res,"register.jsp");
     }
+    return req.getRequestDispatcher("/JSP/register.jsp");
   }
 
-  private void handleLogin(HttpServletRequest req, HttpServletResponse res) 
-      throws SQLException , ServletException, IOException{
+  RequestDispatcher handleLogin(HttpServletRequest req, HttpServletResponse res) 
+      throws SQLException {
     User candidateUser = parseUserInfo(req); 
     candidateUser = db.validateLogin(candidateUser);
     if(candidateUser != null) {
@@ -119,30 +116,30 @@ public class ControllerServlet extends HttpServlet {
       loggedInUsers.put(sessionToken, candidateUser);
       res.addCookie(createSessionTokenCookie(sessionToken));
       req.setAttribute("user_info", candidateUser);
-      render(req,res,"profile.jsp");
+      return req.getRequestDispatcher("/JSP/profile.jsp");
 
     } else {
       req.setAttribute("error_msg", "Invalid Credentials");
-      render(req,res,"login.jsp");
     }
+    return req.getRequestDispatcher("/JSP/login.jsp");
   }
 
-  private void handleProfile(HttpServletRequest req, HttpServletResponse res) 
-      throws SQLException , ServletException, IOException{
+  RequestDispatcher handleProfile(HttpServletRequest req, HttpServletResponse res) 
+      throws SQLException {
     String userToken=getSessionToken(req);
     if (userToken!=null && loggedInUsers.containsKey(userToken)){
       User currentUser = loggedInUsers.get(userToken);
       req.setAttribute("user_info" , currentUser);
 
-      render(req,res,"profile.jsp");
+      return req.getRequestDispatcher("/JSP/profile.jsp");
     }else{
       req.setAttribute("error_msg", "Access denied , please log in first");
-      render(req,res,"login.jsp");
+      return req.getRequestDispatcher("/JSP/login.jsp"); 
     }
   }
 
-  private void handlePrediction(HttpServletRequest req , HttpServletResponse res) 
-      throws SQLException , ServletException, IOException {
+  RequestDispatcher handlePrediction(HttpServletRequest req , HttpServletResponse res) 
+      throws SQLException {
     String userToken=getSessionToken(req);
     if (userToken!=null && loggedInUsers.containsKey(userToken)){
       User currentUser = loggedInUsers.get(userToken);
@@ -167,15 +164,15 @@ public class ControllerServlet extends HttpServlet {
       }catch (Exception e) {
           req.setAttribute("error_msg", "Error with the Flask API: " + e.getMessage());
       }
-      render(req,res,"predict.jsp");
+      return req.getRequestDispatcher("/JSP/predict.jsp");
     }else{
       req.setAttribute("error_msg", "Access denied , please log in first");
-      render(req,res,"login.jsp") ;
+      return req.getRequestDispatcher("/JSP/login.jsp"); 
     }
   }
 
-  private void handleHistory(HttpServletRequest req, HttpServletResponse res) 
-      throws SQLException , ServletException, IOException {
+  RequestDispatcher handleHistory(HttpServletRequest req, HttpServletResponse res) 
+      throws SQLException {
     String userToken = getSessionToken(req);
     if (userToken!=null && loggedInUsers.containsKey(userToken)){
       User currentUser = loggedInUsers.get(userToken);
@@ -186,15 +183,15 @@ public class ControllerServlet extends HttpServlet {
       }catch(Exception e){
          req.setAttribute("error_msg","Error fetching history: "+e.getMessage());
       }
-      render(req,res,"history.jsp");
+      return req.getRequestDispatcher("/JSP/history.jsp");
     }else{
       req.setAttribute("error_msg", "Access denied, please log in first");
-      render(req,res,"login.jsp");
+      return req.getRequestDispatcher("/JSP/login.jsp");
     }
   }
 
-  private void handleAdmin(HttpServletRequest req , HttpServletResponse res) 
-      throws SQLException , ServletException, IOException {
+  RequestDispatcher handleAdmin(HttpServletRequest req , HttpServletResponse res) 
+      throws SQLException {
     String userToken=getSessionToken(req);
     if (userToken != null && loggedInUsers.containsKey(userToken)) {
       User currentUser = loggedInUsers.get(userToken);
@@ -203,19 +200,19 @@ public class ControllerServlet extends HttpServlet {
         req.setAttribute("user_info", currentUser);
         ArrayList<User> AllUsers = db.getAllUsers();
         req.setAttribute("all_users",AllUsers);
-        render(req,res,"admin.jsp");
+        return req.getRequestDispatcher("/JSP/admin.jsp");
       } else {
         req.setAttribute("error_msg", "Access denied: Admins only");
-        render(req,res,"profile.jsp");
+        return req.getRequestDispatcher("/JSP/profile.jsp");
       }
     } else {
       req.setAttribute("error_msg", "Please log in first");
-      render(req,res,"login.jsp");
+      return req.getRequestDispatcher("/JSP/login.jsp");
     }
   }
 
-  private void  handleEditUserProfile(HttpServletRequest req, HttpServletResponse res)
-      throws SQLException , ServletException, IOException  {
+  RequestDispatcher handleEditUserProfile(HttpServletRequest req, HttpServletResponse res)
+      throws SQLException {
     String userToken = getSessionToken(req);
     if (userToken != null && loggedInUsers.containsKey(userToken)) {
       User targetUser = parseUserInfo(req);
@@ -224,20 +221,20 @@ public class ControllerServlet extends HttpServlet {
         User updatedUserInfo = db.getUser(oldUserInfo.getEmail());
         loggedInUsers.put(userToken, updatedUserInfo);
         req.setAttribute("user_info", updatedUserInfo);
-        render(req,res,"profile.jsp");
+        return req.getRequestDispatcher("/JSP/profile.jsp");
       } else {
         req.setAttribute("error_msg", "Failed to update user profile");
-      render(req,res,"profile.jsp");
       }
     } else {
       req.setAttribute("error_msg", "Failed to update user profile");
-      render(req,res,"login.jsp");
+      return req.getRequestDispatcher("/JSP/login.jsp");
     }
+    return req.getRequestDispatcher("/JSP/profile.jsp");
   }
 
 
-  private void handleLogout(HttpServletRequest req, HttpServletResponse res) 
-     throws SQLException , ServletException, IOException {
+  RequestDispatcher handleLogout(HttpServletRequest req, HttpServletResponse res) 
+     throws SQLException {
     String userToken = getSessionToken(req);
     if (userToken != null && loggedInUsers.containsKey(userToken)) {
       loggedInUsers.remove(userToken);
@@ -245,7 +242,7 @@ public class ControllerServlet extends HttpServlet {
     } else {
       req.setAttribute("error_msg", "Please log in first");
     }
-    render(req,res,"login.jsp");
+    return req.getRequestDispatcher("/JSP/login.jsp");
   }
 
   Cookie createSessionTokenCookie(String sessionToken) {
