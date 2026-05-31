@@ -50,13 +50,15 @@ public class ControllerServlet extends HttpServlet {
         rd = handleHistory(req, res);
       } else if("admin".equals(requestType)) {
         rd = handleAdmin(req, res);
+      } else if("logout".equals(requestType)) {
+        rd = handleLogout(req, res);
       } else {
         rd = req.getRequestDispatcher("/JSP/error.jsp");
         req.setAttribute("error_msg", "Unsupported Request Type");
       }
       
     } catch(SQLException e) {
-      throw new ServletException("DB quering failed", e);
+      throw new ServletException("DB querying failed", e);
     }
     if(rd != null)
       rd.forward(req, res);
@@ -79,7 +81,7 @@ public class ControllerServlet extends HttpServlet {
       }
 
     } catch(SQLException e) {
-      throw new ServletException("DB quering failed", e);
+      throw new ServletException("DB querying failed", e);
     }
     if(rd != null)
       rd.forward(req, res);
@@ -207,6 +209,18 @@ public class ControllerServlet extends HttpServlet {
     }
   }
 
+  RequestDispatcher handleLogout(HttpServletRequest req, HttpServletResponse res) 
+     throws SQLException {
+    String userToken=getSessionToken(req);
+    if (userToken != null && loggedInUsers.containsKey(userToken)) {
+      loggedInUsers.remove(userToken);
+      clearCookies(req, res);
+    } else {
+      req.setAttribute("error_msg", "Please log in first");
+    }
+    return req.getRequestDispatcher("/JSP/login.jsp");
+  }
+
   Cookie createSessionTokenCookie(String sessionToken) {
     Cookie sessionCookie = new Cookie("session_token", sessionToken);
     sessionCookie.setHttpOnly(true);
@@ -252,5 +266,17 @@ public class ControllerServlet extends HttpServlet {
       }
     }
     return null;
+  }
+
+  private void clearCookies(HttpServletRequest req, HttpServletResponse res) {
+    Cookie[] cookies = req.getCookies();
+    if (cookies != null) {
+      for (Cookie c : cookies) {
+        c.setValue("");
+        c.setMaxAge(0);
+        c.setPath("/");
+        res.addCookie(c);
+      }
+    }
   }
 }
