@@ -17,8 +17,8 @@
         <input type="number" name="age" placeholder="Age"><br>
         <label>Genre:</label>
         <select name="gender">
-            <option value="M">Masculin</option>
-            <option value="F">Feminin</option>
+            <option value="male">Masculin</option>
+            <option value="female">Feminin</option>
         </select><br>
         <input type="email" name="email" placeholder="Email" required><br>
         <input type="password" name="password" placeholder="Mot de passe" required><br>
