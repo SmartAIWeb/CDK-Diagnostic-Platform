@@ -53,7 +53,7 @@ public class ControllerServlet extends HttpServlet {
       } else if("history".equals(requestType)) {
         rd = handleHistory(req, res);
       } else if("admin".equals(requestType)) {
-        rd = handleadmin(req, res);
+        rd = handleAdmin(req, res);
       } else {
         rd = req.getRequestDispatcher("/JSP/error.jsp");
         req.setAttribute("error_msg", "Unsupported Request Type");
@@ -113,9 +113,9 @@ public class ControllerServlet extends HttpServlet {
       req.setAttribute("error_msg", "Access denied , please log in first");
       return req.getRequestDispatcher("/JSP/login.jsp"); 
     }
-}
+  }
 
-RequestDispatcher handlePrediction(HttpServletRequest req , HttpServletResponse res) 
+  RequestDispatcher handlePrediction(HttpServletRequest req , HttpServletResponse res) 
       throws SQLException {
     String userToken=getSessionToken(req);
     if (userToken!=null && loggedInUsers.containsKey(userToken)){
@@ -146,7 +146,8 @@ RequestDispatcher handlePrediction(HttpServletRequest req , HttpServletResponse 
       req.setAttribute("error_msg", "Access denied , please log in first");
       return req.getRequestDispatcher("/JSP/login.jsp"); 
     }
-}
+  }
+
   RequestDispatcher handleHistory(HttpServletRequest req, HttpServletResponse res) 
       throws SQLException {
     String userToken=getSessionToken(req);
@@ -164,11 +165,12 @@ RequestDispatcher handlePrediction(HttpServletRequest req , HttpServletResponse 
       req.setAttribute("error_msg", "Access denied, please log in first");
       return req.getRequestDispatcher("/JSP/login.jsp");
     }
-}
-  RequestDispatcher handleadmin(HttpServletRequest req , HttpServletResponse res) 
-        throws SQLException {
-      String userToken=getSessionToken(req);
-      if (userToken != null && loggedInUsers.containsKey(userToken)) {
+  }
+
+  RequestDispatcher handleAdmin(HttpServletRequest req , HttpServletResponse res) 
+      throws SQLException {
+    String userToken=getSessionToken(req);
+    if (userToken != null && loggedInUsers.containsKey(userToken)) {
       User currentUser = loggedInUsers.get(userToken);
       //Verification si admin
       if ("admin".equals(currentUser.getRole())) { 
@@ -184,8 +186,7 @@ RequestDispatcher handlePrediction(HttpServletRequest req , HttpServletResponse 
       req.setAttribute("error_msg", "Please log in first");
       return req.getRequestDispatcher("/JSP/login.jsp");
     }
-}
-
+  }
 
   Cookie createSessionTokenCookie(String sessionToken) {
     Cookie sessionCookie = new Cookie("session_token", sessionToken);
@@ -214,16 +215,17 @@ RequestDispatcher handlePrediction(HttpServletRequest req , HttpServletResponse 
     sr.nextBytes(randomBytes);
     return Base64.getUrlEncoder().withoutPadding().encodeToString(randomBytes);
   }
+
   //recuperer le token du cookie
-private String getSessionToken(HttpServletRequest req) {
+  private String getSessionToken(HttpServletRequest req) {
     Cookie[] cookies = req.getCookies();
     if (cookies != null) {
-        for (Cookie c : cookies) {
-            if ("session_token".equals(c.getName())) {
-                return c.getValue();
-            }
+      for (Cookie c : cookies) {
+        if ("session_token".equals(c.getName())) {
+          return c.getValue();
         }
+      }
     }
     return null;
-}
+  }
 }
