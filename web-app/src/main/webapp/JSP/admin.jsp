@@ -9,6 +9,7 @@
     <h1>Tableau de bord Administrateur</h1>
     <nav>
         <a href="controller?request_type=admin">Rafraichir la liste</a> |
+        <a href="controller?request_type=profile">Profile</a> |
         <a href="controller?request_type=logout">Deconnexion</a>
     </nav>
     <section>
