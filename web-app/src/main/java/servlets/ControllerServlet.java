@@ -53,7 +53,7 @@ public class ControllerServlet extends HttpServlet {
       } else if("logout".equals(requestType)) {
         rd = handleLogout(req, res);
       } else {
-        rd = req.getRequestDispatcher("/JSP/error.jsp");
+        rd = req.getRequestDispatcher("/error.jsp");
         req.setAttribute("error_msg", "Unsupported Request Type");
       }
       
@@ -78,7 +78,7 @@ public class ControllerServlet extends HttpServlet {
       } else if("edit_info".equals(requestType)) {
         rd = handleEditUserProfile(req, res);
       } else {
-        rd = req.getRequestDispatcher("/JSP/error.jsp");
+        rd = req.getRequestDispatcher("/error.jsp");
         req.setAttribute("error_msg", "Unsupported Request Type");
       }
 
@@ -99,11 +99,11 @@ public class ControllerServlet extends HttpServlet {
       loggedInUsers.put(sessionToken, newUser);
       res.addCookie(createSessionTokenCookie(sessionToken));
       req.setAttribute("user_info", newUser);
-      return req.getRequestDispatcher("/JSP/profile.jsp");
+      return req.getRequestDispatcher("/profile.jsp");
     } else {
       req.setAttribute("error_msg", "Email already linked to an account");
     }
-    return req.getRequestDispatcher("/JSP/register.jsp");
+    return req.getRequestDispatcher("/register.jsp");
   }
 
   RequestDispatcher handleLogin(HttpServletRequest req, HttpServletResponse res) 
@@ -116,12 +116,12 @@ public class ControllerServlet extends HttpServlet {
       loggedInUsers.put(sessionToken, candidateUser);
       res.addCookie(createSessionTokenCookie(sessionToken));
       req.setAttribute("user_info", candidateUser);
-      return req.getRequestDispatcher("/JSP/profile.jsp");
+      return req.getRequestDispatcher("/profile.jsp");
 
     } else {
       req.setAttribute("error_msg", "Invalid Credentials");
     }
-    return req.getRequestDispatcher("/JSP/login.jsp");
+    return req.getRequestDispatcher("/login.jsp");
   }
 
   RequestDispatcher handleProfile(HttpServletRequest req, HttpServletResponse res) 
@@ -131,10 +131,10 @@ public class ControllerServlet extends HttpServlet {
       User currentUser = loggedInUsers.get(userToken);
       req.setAttribute("user_info" , currentUser);
 
-      return req.getRequestDispatcher("/JSP/profile.jsp");
+      return req.getRequestDispatcher("/profile.jsp");
     }else{
       req.setAttribute("error_msg", "Access denied , please log in first");
-      return req.getRequestDispatcher("/JSP/login.jsp"); 
+      return req.getRequestDispatcher("/login.jsp"); 
     }
   }
 
@@ -164,10 +164,10 @@ public class ControllerServlet extends HttpServlet {
       }catch (Exception e) {
           req.setAttribute("error_msg", "Error with the Flask API: " + e.getMessage());
       }
-      return req.getRequestDispatcher("/JSP/predict.jsp");
+      return req.getRequestDispatcher("/predict.jsp");
     }else{
       req.setAttribute("error_msg", "Access denied , please log in first");
-      return req.getRequestDispatcher("/JSP/login.jsp"); 
+      return req.getRequestDispatcher("/login.jsp"); 
     }
   }
 RequestDispatcher handleHistory(HttpServletRequest req, HttpServletResponse res) 
@@ -189,10 +189,10 @@ RequestDispatcher handleHistory(HttpServletRequest req, HttpServletResponse res)
         } catch(Exception e) {
             req.setAttribute("error_msg", "Error fetching history: " + e.getMessage());
         }
-        return req.getRequestDispatcher("/JSP/history.jsp");
+        return req.getRequestDispatcher("/history.jsp");
     } else {
         req.setAttribute("error_msg", "Access denied, please log in first");
-        return req.getRequestDispatcher("/JSP/login.jsp");
+        return req.getRequestDispatcher("/login.jsp");
     }
 }
 
@@ -206,14 +206,14 @@ RequestDispatcher handleHistory(HttpServletRequest req, HttpServletResponse res)
         req.setAttribute("user_info", currentUser);
         ArrayList<User> AllUsers = db.getAllUsers();
         req.setAttribute("all_users",AllUsers);
-        return req.getRequestDispatcher("/JSP/admin.jsp");
+        return req.getRequestDispatcher("/admin.jsp");
       } else {
         req.setAttribute("error_msg", "Access denied: Admins only");
-        return req.getRequestDispatcher("/JSP/profile.jsp");
+        return req.getRequestDispatcher("/profile.jsp");
       }
     } else {
       req.setAttribute("error_msg", "Please log in first");
-      return req.getRequestDispatcher("/JSP/login.jsp");
+      return req.getRequestDispatcher("/login.jsp");
     }
   }
 
@@ -227,15 +227,15 @@ RequestDispatcher handleHistory(HttpServletRequest req, HttpServletResponse res)
         User updatedUserInfo = db.getUser(oldUserInfo.getEmail());
         loggedInUsers.put(userToken, updatedUserInfo);
         req.setAttribute("user_info", updatedUserInfo);
-        return req.getRequestDispatcher("/JSP/profile.jsp");
+        return req.getRequestDispatcher("/profile.jsp");
       } else {
         req.setAttribute("error_msg", "Failed to update user profile");
       }
     } else {
       req.setAttribute("error_msg", "Failed to update user profile");
-      return req.getRequestDispatcher("/JSP/login.jsp");
+      return req.getRequestDispatcher("/login.jsp");
     }
-    return req.getRequestDispatcher("/JSP/profile.jsp");
+    return req.getRequestDispatcher("/profile.jsp");
   }
 
 
@@ -248,7 +248,7 @@ RequestDispatcher handleHistory(HttpServletRequest req, HttpServletResponse res)
     } else {
       req.setAttribute("error_msg", "Please log in first");
     }
-    return req.getRequestDispatcher("/JSP/login.jsp");
+    return req.getRequestDispatcher("/login.jsp");
   }
 
   Cookie createSessionTokenCookie(String sessionToken) {
