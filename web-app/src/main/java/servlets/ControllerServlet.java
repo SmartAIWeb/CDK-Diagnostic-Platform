@@ -171,24 +171,32 @@ public class ControllerServlet extends HttpServlet {
     }
   }
 
-  RequestDispatcher handleHistory(HttpServletRequest req, HttpServletResponse res) 
-      throws SQLException {
+
+RequestDispatcher handleHistory(HttpServletRequest req, HttpServletResponse res) 
+      throws SQLException{
     String userToken = getSessionToken(req);
-    if (userToken!=null && loggedInUsers.containsKey(userToken)){
-      User currentUser = loggedInUsers.get(userToken);
-      req.setAttribute("user_info", currentUser);
-      try{
-        ArrayList<Prediction> userHistory = db.getUserHistory(currentUser.getUserId());
-        req.setAttribute("prediction_history",userHistory);
-      }catch(Exception e){
-         req.setAttribute("error_msg","Error fetching history: "+e.getMessage());
-      }
-      return req.getRequestDispatcher("/JSP/history.jsp");
-    }else{
-      req.setAttribute("error_msg", "Access denied, please log in first");
-      return req.getRequestDispatcher("/JSP/login.jsp");
+    if (userToken != null && loggedInUsers.containsKey(userToken)) {
+        User currentUser = loggedInUsers.get(userToken);
+        String userIdParam = req.getParameter("userId");
+        int targetUserId;
+        if (userIdParam != null && "admin".equalsIgnoreCase(currentUser.getRole())) {
+            targetUserId = Integer.parseInt(userIdParam);
+        } else {
+            targetUserId = currentUser.getUserId();
+        }
+        req.setAttribute("user_info", currentUser);
+        try {
+            ArrayList<Prediction> userHistory = db.getUserHistory(targetUserId);
+            req.setAttribute("prediction_history", userHistory);
+        } catch(Exception e) {
+            req.setAttribute("error_msg", "Error fetching history: " + e.getMessage());
+        }
+        return req.getRequestDispatcher("/JSP/history.jsp");
+    } else {
+        req.setAttribute("error_msg", "Access denied, please log in first");
+        return req.getRequestDispatcher("/JSP/login.jsp");
     }
-  }
+}
 
   RequestDispatcher handleAdmin(HttpServletRequest req , HttpServletResponse res) 
       throws SQLException {
@@ -196,7 +204,7 @@ public class ControllerServlet extends HttpServlet {
     if (userToken != null && loggedInUsers.containsKey(userToken)) {
       User currentUser = loggedInUsers.get(userToken);
       //Verification si admin
-      if ("admin".equals(currentUser.getRole())) { 
+      if ("admin".equalsIgnoreCase(currentUser.getRole())) { 
         req.setAttribute("user_info", currentUser);
         ArrayList<User> AllUsers = db.getAllUsers();
         req.setAttribute("all_users",AllUsers);
