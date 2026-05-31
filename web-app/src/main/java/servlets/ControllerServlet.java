@@ -170,7 +170,6 @@ public class ControllerServlet extends HttpServlet {
       return req.getRequestDispatcher("/JSP/login.jsp"); 
     }
   }
-
 RequestDispatcher handleHistory(HttpServletRequest req, HttpServletResponse res) 
       throws SQLException{
     String userToken = getSessionToken(req);
