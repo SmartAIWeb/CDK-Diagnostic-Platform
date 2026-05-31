@@ -1,13 +1,13 @@
 from flask import Flask, request, jsonify
 import pickle
 import numpy as np
-import pandas as pd
+import json
 import os 
 
 app = Flask(__name__)
 
-df = pd.read_csv('preprocessed_kidney_disease_data.csv')
-FEATURE_ORDER = [col for col in df.columns if col not in ['patient_id', 'ckd_diagnosis']]
+with open("features.json", "r") as f:
+    FEATURE_ORDER = json.load(f)["feature_order"]
 
 modele_cache = {}
 
