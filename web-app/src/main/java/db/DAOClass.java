@@ -95,11 +95,11 @@ public class DAOClass {
       return stmt.executeUpdate() != 0;
     }
   }
+
   public ArrayList<Prediction> getUserHistory(int userId) throws SQLException {
     ArrayList<Prediction> historyList = new ArrayList<>();
     String sql = "SELECT * FROM History WHERE user_id = ? ORDER BY date DESC";
-    try{
-      PreparedStatement stmt = connection.prepareStatement(sql);
+    try(PreparedStatement stmt = connection.prepareStatement(sql)) {
       stmt.setInt(1, userId);
       try (ResultSet rs = stmt.executeQuery()) {
         while (rs.next()) {
@@ -115,11 +115,11 @@ public class DAOClass {
     }
     return historyList; 
   }
+
   public ArrayList<User> getAllUsers() throws SQLException {
     ArrayList<User> allusers = new ArrayList<>();
     String sql = "SELECT * FROM Users ORDER BY created_at DESC";
-    try {
-      Statement stmt = connection.createStatement();
+    try (Statement stmt = connection.createStatement()) {
       try (ResultSet rs = stmt.executeQuery(sql);) {
         while (rs.next()) {
           User user = new User();
