@@ -190,6 +190,7 @@ RequestDispatcher handlePrediction(HttpServletRequest req , HttpServletResponse 
   Cookie createSessionTokenCookie(String sessionToken) {
     Cookie sessionCookie = new Cookie("session_token", sessionToken);
     sessionCookie.setHttpOnly(true);
+    sessionCookie.setSecure(true);
     return sessionCookie;
   }
 
