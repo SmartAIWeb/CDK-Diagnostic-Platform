@@ -75,6 +75,8 @@ public class ControllerServlet extends HttpServlet {
         rd = handleRegistering(req, res);
       } else if("login".equals(requestType)) {
         rd = handleLogin(req, res);
+      } else if("edit_info".equals(requestType)) {
+        rd = handleEditUserProfile(req, res);
       } else {
         rd = req.getRequestDispatcher("/JSP/error.jsp");
         req.setAttribute("error_msg", "Unsupported Request Type");
@@ -171,7 +173,7 @@ public class ControllerServlet extends HttpServlet {
 
   RequestDispatcher handleHistory(HttpServletRequest req, HttpServletResponse res) 
       throws SQLException {
-    String userToken=getSessionToken(req);
+    String userToken = getSessionToken(req);
     if (userToken!=null && loggedInUsers.containsKey(userToken)){
       User currentUser = loggedInUsers.get(userToken);
       req.setAttribute("user_info", currentUser);
@@ -209,9 +211,31 @@ public class ControllerServlet extends HttpServlet {
     }
   }
 
+  RequestDispatcher handleEditUserProfile(HttpServletRequest req, HttpServletResponse res)
+      throws SQLException {
+    String userToken = getSessionToken(req);
+    if (userToken != null && loggedInUsers.containsKey(userToken)) {
+      User targetUser = parseUserInfo(req);
+      if(db.updateUserInfo(targetUser)) {
+        User oldUserInfo = loggedInUsers.get(userToken);
+        User updatedUserInfo = db.getUser(oldUserInfo.getEmail());
+        loggedInUsers.put(userToken, updatedUserInfo);
+        req.setAttribute("user_info", updatedUserInfo);
+        return req.getRequestDispatcher("/JSP/profile.jsp");
+      } else {
+        req.setAttribute("error_msg", "Failed to update user profile");
+      }
+    } else {
+      req.setAttribute("error_msg", "Failed to update user profile");
+      return req.getRequestDispatcher("/JSP/login.jsp");
+    }
+    return req.getRequestDispatcher("/JSP/profile.jsp");
+  }
+
+
   RequestDispatcher handleLogout(HttpServletRequest req, HttpServletResponse res) 
      throws SQLException {
-    String userToken=getSessionToken(req);
+    String userToken = getSessionToken(req);
     if (userToken != null && loggedInUsers.containsKey(userToken)) {
       loggedInUsers.remove(userToken);
       clearCookies(req, res);

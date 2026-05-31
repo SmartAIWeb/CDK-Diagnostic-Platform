@@ -110,6 +110,16 @@ public class DAOClass {
     return historyList; 
   }
 
+  public User getUser(String email) 
+    throws SQLException {
+    try(ResultSet row = findUserByEmail(email)) {
+      if(row.next()) {
+        return new User(row);
+      }
+      return null;
+    }
+  }
+
   public ArrayList<User> getAllUsers() throws SQLException {
     ArrayList<User> allusers = new ArrayList<>();
     String sql = "SELECT * FROM Users ORDER BY created_at DESC";
