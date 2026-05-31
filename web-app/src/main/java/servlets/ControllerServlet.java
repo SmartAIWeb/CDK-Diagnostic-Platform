@@ -222,7 +222,11 @@ public class ControllerServlet extends HttpServlet {
     user.setLastName(req.getParameter("lastName"));
     String ageParam = req.getParameter("age");
     if (ageParam != null && !ageParam.isEmpty()) {
+      try {
         user.setAge(Integer.parseInt(ageParam));
+      } catch (NumberFormatException e) {
+        user.setAge(-1);
+      }
     }
     user.setGender(req.getParameter("gender"));
     user.setEmail(req.getParameter("email"));
