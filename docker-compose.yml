@@ -1,14 +1,14 @@
 services:
   web-app:
-    image: tomcat:10.1-jdk21
+    build:
+      context: ./web-app
+      dockerfile: Dockerfile
     container_name: jee-tomcat
     restart: unless-stopped
     ports:
       - "8080:8080"
     networks:
       - backend
-    volumes:
-      - ./web-app/target/predictionApp.war:/usr/local/tomcat/webapps/ROOT.war:z
     environment:
       DB_HOST: db
       DB_PORT: 3306
