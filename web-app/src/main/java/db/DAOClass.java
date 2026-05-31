@@ -27,11 +27,11 @@ public class DAOClass {
     connection = DriverManager.getConnection(dbUrl, dbUser, dbPassword);
   }
 
-  ResultSet findUserByEmail(User targetInfo) 
+  ResultSet findUserByEmail(String email) 
       throws SQLException{
     String sql = "SELECT * FROM Users WHERE email=?";
     PreparedStatement stmt = connection.prepareStatement(sql);
-    stmt.setString(1, targetInfo.getEmail());
+    stmt.setString(1, email);
     return stmt.executeQuery();
   }
 
@@ -53,8 +53,7 @@ public class DAOClass {
 
   public User validateLogin(User targetInfo)
       throws SQLException {
-    ResultSet row = findUserByEmail(targetInfo);
-    try {
+    try(ResultSet row = findUserByEmail(targetInfo.getEmail())) {
       if(row.next()) {
         User fetchedUser = new User(row);
         if(BCrypt.checkpw(targetInfo.getPassword(), fetchedUser.getPassword())) {
@@ -62,22 +61,17 @@ public class DAOClass {
         }
       }
       return null;
-    } finally {
-      row.getStatement().close();
     }
   }
 
   public User registerNewUser(User targetInfo)
       throws SQLException {
-    ResultSet row = findUserByEmail(targetInfo);
-    try {
+    try(ResultSet row = findUserByEmail(targetInfo.getEmail())) {
       if(!row.next()) {
         if(insertNewUser(targetInfo))
           return targetInfo;
       }
       return null;
-    } finally {
-      row.getStatement().close();
     }
   }
 
