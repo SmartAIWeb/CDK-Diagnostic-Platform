@@ -192,6 +192,8 @@ public class ControllerServlet extends HttpServlet {
     Cookie sessionCookie = new Cookie("session_token", sessionToken);
     sessionCookie.setHttpOnly(true);
     sessionCookie.setSecure(true);
+    sessionCookie.setPath("/");
+    sessionCookie.setMaxAge(3600 * 24); //24h
     return sessionCookie;
   }
 
