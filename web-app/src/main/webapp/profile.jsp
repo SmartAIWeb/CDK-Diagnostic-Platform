@@ -34,13 +34,13 @@
     </script>
     <hr>
     <nav>
-      <a href="controller?request_type=predict">Faire une prediction</a> |
-      <a href="controller?request_type=history">Voir mon historique</a> |
+      <a href="predict.jsp">Faire une prediction</a> |
+      <a href="history.jsp">Voir mon historique</a> |
       <a href="controller?request_type=logout">Deconnexion</a>
     </nav>
   <% } else { %>
     <p>Erreur: Impossible de charger les informations du profil</p>
-    <a href="controller?request_type=login">Retour a la connexion</a>
+    <a href="login.jsp">Retour a la connexion</a>
   <% } %>
 </body>
 </html>

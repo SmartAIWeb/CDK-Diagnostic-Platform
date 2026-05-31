@@ -16,6 +16,6 @@
         <input type="password" name="password" placeholder="Mot de passe" required><br>
         <button type="submit">Connexion</button>
     </form>    
-    <p>Vous n'avez pas de compte ?<a href="controller?request_type=register">Creez votre compte ici</a></p>
+    <p>Vous n'avez pas de compte ?<a href="register.jsp">Creez votre compte ici</a></p>
 </body>
 </html>

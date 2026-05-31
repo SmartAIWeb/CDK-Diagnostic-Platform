@@ -8,8 +8,8 @@
 <body>
     <h1>Tableau de bord Administrateur</h1>
     <nav>
-        <a href="controller?request_type=admin">Rafraichir la liste</a> |
-        <a href="controller?request_type=profile">Profile</a> |
+        <a href="admin.jsp">Rafraichir la liste</a> |
+        <a href="profile.jsp">Profile</a> |
         <a href="controller?request_type=logout">Deconnexion</a>
     </nav>
     <section>
