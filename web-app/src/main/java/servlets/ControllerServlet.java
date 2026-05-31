@@ -42,11 +42,7 @@ public class ControllerServlet extends HttpServlet {
     String requestType = req.getParameter("request_type");
 
     try {
-      if("register".equals(requestType))
-        rd = handleRegistering(req, res);
-      else if("login".equals(requestType))
-        rd = handleLogin(req, res);
-      else if("profile".equals(requestType)) {
+      if("profile".equals(requestType)) {
         rd = handleProfile(req,res);
       } else if("predict".equals(requestType)) {
         rd = handlePrediction(req, res);
@@ -59,6 +55,29 @@ public class ControllerServlet extends HttpServlet {
         req.setAttribute("error_msg", "Unsupported Request Type");
       }
       
+    } catch(SQLException e) {
+      throw new ServletException("DB quering failed", e);
+    }
+    if(rd != null)
+      rd.forward(req, res);
+  }
+
+
+  public void doPost(HttpServletRequest req, HttpServletResponse res) 
+      throws ServletException, IOException {
+    RequestDispatcher rd = null;
+    String requestType = req.getParameter("request_type");
+
+    try {
+      if("register".equals(requestType)) {
+        rd = handleRegistering(req, res);
+      } else if("login".equals(requestType)) {
+        rd = handleLogin(req, res);
+      } else {
+        rd = req.getRequestDispatcher("/JSP/error.jsp");
+        req.setAttribute("error_msg", "Unsupported Request Type");
+      }
+
     } catch(SQLException e) {
       throw new ServletException("DB quering failed", e);
     }
