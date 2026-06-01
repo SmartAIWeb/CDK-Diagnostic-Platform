@@ -30,6 +30,7 @@
 
       <form method="POST" action="controller">
         <input type="hidden" name="request_type" value="edit_info">
+        <input type="hidden" name="email" value="<%= user.getEmail() %>">
 
         <div class="form-group">
           <label for="firstName">Prenom :</label>
