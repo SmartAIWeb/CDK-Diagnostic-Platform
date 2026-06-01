@@ -174,7 +174,7 @@ public class DAOClass {
     try(Statement stmt = connection.createStatement();
          ResultSet rs = stmt.executeQuery(sql)){
         while (rs.next()) {
-            ModRequest req = new ModRequest();
+            AdminRequest req = new AdminRequest();
             req.setId(rs.getInt("id"));
             req.setUserId(rs.getInt("user_id"));
             req.setMessage(rs.getString("message"));
