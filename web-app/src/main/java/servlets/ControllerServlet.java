@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.http.HttpSession;
 
 import java.security.SecureRandom;
 import java.sql.SQLException;
@@ -41,6 +42,14 @@ public class ControllerServlet extends HttpServlet {
       throw new ServletException("DB init failed", e);
     }
   }
+  private void syncSessionWithUser(HttpServletRequest req, User user) {
+        if (user != null) {
+            req.getSession().setAttribute("user_info", user);
+        } else {
+            HttpSession session = req.getSession(false);
+            if (session != null) session.invalidate();
+        }
+    }
 
   public void doGet(HttpServletRequest req, HttpServletResponse res) 
       throws ServletException, IOException {
@@ -115,7 +124,7 @@ public class ControllerServlet extends HttpServlet {
       String sessionToken = generateSessionToken();
       loggedInUsers.put(sessionToken, newUser);
       res.addCookie(createSessionTokenCookie(sessionToken));
-      req.setAttribute("user_info", newUser);
+      syncSessionWithUser(req, newUser);
       return req.getRequestDispatcher("/profile.jsp");
     } else {
       req.setAttribute("error_msg", "Email already linked to an account");
@@ -132,7 +141,7 @@ public class ControllerServlet extends HttpServlet {
       String sessionToken = generateSessionToken();
       loggedInUsers.put(sessionToken, candidateUser);
       res.addCookie(createSessionTokenCookie(sessionToken));
-      req.setAttribute("user_info", candidateUser);
+      syncSessionWithUser(req, candidateUser);
       return req.getRequestDispatcher("/profile.jsp");
 
     } else {
@@ -146,6 +155,7 @@ public class ControllerServlet extends HttpServlet {
     String userToken=getSessionToken(req);
     if (userToken!=null && loggedInUsers.containsKey(userToken)){
       User currentUser = loggedInUsers.get(userToken);
+      syncSessionWithUser(req, currentUser);
       req.setAttribute("user_info" , currentUser);
 
       return req.getRequestDispatcher("/profile.jsp");
@@ -163,7 +173,7 @@ public class ControllerServlet extends HttpServlet {
       return req.getRequestDispatcher("/login.jsp");
     }
     User currentUser = loggedInUsers.get(userToken);
-    req.setAttribute("user_info", currentUser);
+    syncSessionWithUser(req, currentUser);
 
     Scanner scanner = null;
     HttpURLConnection conn = null;
@@ -218,7 +228,7 @@ public class ControllerServlet extends HttpServlet {
         } else {
             targetUserId = currentUser.getUserId();
         }
-        req.setAttribute("user_info", currentUser);
+        syncSessionWithUser(req, currentUser);
         try {
             ArrayList<Prediction> userHistory = db.getUserHistory(targetUserId);
             req.setAttribute("prediction_history", userHistory);
@@ -239,7 +249,7 @@ public class ControllerServlet extends HttpServlet {
       User currentUser = loggedInUsers.get(userToken);
       //Verification si admin
       if ("admin".equalsIgnoreCase(currentUser.getRole())) { 
-        req.setAttribute("user_info", currentUser);
+        syncSessionWithUser(req, currentUser);
         ArrayList<User> AllUsers = db.getAllUsers();
         req.setAttribute("all_users",AllUsers);
         ArrayList<AdminRequest> ModRequest = db.getPendingModRequests();
@@ -261,13 +271,13 @@ public class ControllerServlet extends HttpServlet {
     if (userToken != null && loggedInUsers.containsKey(userToken)) {
       User oldUserInfo = loggedInUsers.get(userToken);
       User targetUser = parseUserInfo(req);
-      req.setAttribute("user_info", oldUserInfo);
+      syncSessionWithUser(req, oldUserInfo);
       if(oldUserInfo.getEmail().equals(targetUser.getEmail())) {
         if(db.updateUserInfo(targetUser)) {
           User updatedUserInfo = db.getUser(oldUserInfo.getEmail());
           updatedUserInfo.setPassword(null);
           loggedInUsers.put(userToken, updatedUserInfo);
-          req.setAttribute("user_info", updatedUserInfo);
+          syncSessionWithUser(req, updatedUserInfo);
           return req.getRequestDispatcher("/profile.jsp");
         } else {
           req.setAttribute("error_msg", "Database update failed");
@@ -290,6 +300,7 @@ public class ControllerServlet extends HttpServlet {
     if (userToken != null && loggedInUsers.containsKey(userToken)) {
       loggedInUsers.remove(userToken);
       clearCookies(req, res);
+      syncSessionWithUser(req, null);
     } else {
       req.setAttribute("error_msg", "Please log in first");
     }
