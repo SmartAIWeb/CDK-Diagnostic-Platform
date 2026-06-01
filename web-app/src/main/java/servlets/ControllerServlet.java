@@ -153,9 +153,13 @@ public class ControllerServlet extends HttpServlet {
     }
     User currentUser = loggedInUsers.get(userToken);
     req.setAttribute("user_info", currentUser);
+
+    Scanner scanner = null;
+    HttpURLConnection conn = null;
+
     try {
       URL url = new URL(System.getenv("ML_API_URL"));
-      HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+      conn = (HttpURLConnection) url.openConnection();
 
       String unprocessedFeatures = extractFeaturesFromReq(req);
       String processedFeatures = buildEncodedJsonFeatures(req);
@@ -165,8 +169,8 @@ public class ControllerServlet extends HttpServlet {
       conn.setDoOutput(true);
       conn.getOutputStream().write(processedFeatures.getBytes("UTF-8"));
 
-      Scanner scanner = new Scanner(conn.getInputStream()).useDelimiter("\\A");
-      String predictionRes = scanner.hasNext() ? scanner.next() : " ";
+      scanner = new Scanner(conn.getInputStream()).useDelimiter("\\A");
+      String predictionRes = scanner.hasNext() ? scanner.next() : "";
       JsonObject predictionResJson = new Gson().fromJson(predictionRes, JsonObject.class);
 
       int prediction_value = predictionResJson.get("prediction").getAsInt();
@@ -175,17 +179,18 @@ public class ControllerServlet extends HttpServlet {
       req.setAttribute("prediction_result", prediction_value);
       req.setAttribute("prediction_probability", prediction_probability);
 
-      conn.disconnect();
-      if(!predictionRes.trim().equals(""))
-        db.insertNewPrediction(
-          currentUser.getUserId(),
-          unprocessedFeatures, 
-          prediction_value,
-          prediction_probability
-        );
+      db.insertNewPrediction(
+        currentUser.getUserId(),
+        unprocessedFeatures, 
+        prediction_value,
+        prediction_probability
+      );
     } catch (Exception e) {
       req.setAttribute("error_msg", "Error with the Flask API: " + e.getMessage());
       return req.getRequestDispatcher("/error.jsp");
+    } finally {
+      if(conn != null) conn.disconnect();
+      if(scanner != null) scanner.close();
     }
     return req.getRequestDispatcher("/predict.jsp");
   }
