@@ -69,7 +69,7 @@ public class DAOClass {
     try(ResultSet row = findUserByEmail(targetInfo.getEmail())) {
       if(!row.next()) {
         if(insertNewUser(targetInfo))
-          return targetInfo;
+          return getUser(targetInfo.getEmail());
       }
       return null;
     }
