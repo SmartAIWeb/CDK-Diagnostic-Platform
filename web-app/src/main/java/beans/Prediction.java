@@ -3,9 +3,10 @@ package beans;
 public class Prediction {
     private int historyId;
     private int userId;
-    private String inputData;
-    private String predictionRes;
-    private String date;
+    private String inputFeatures;
+    private int predictionRes;
+    private int predictionProbability;
+    private String dateOfCreation;
 
     public Prediction() {}
     public int getHistoryId() {
@@ -20,22 +21,28 @@ public class Prediction {
     public void setUserId(int userId) {
         this.userId = userId;
     }
-    public String getInputData() {
-        return inputData;
+    public String getInputFeatures() {
+        return inputFeatures;
     }
-    public void setInputData(String inputData) {
-        this.inputData = inputData;
+    public void setInputFeatures(String inputFeatures) {
+        this.inputFeatures = inputFeatures;
     }
-    public String getPredictionRes() {
+    public int getPredictionRes() {
         return predictionRes;
     }
-    public void setPredictionRes(String predictionRes) {
+    public void setPredictionRes(int predictionRes) {
         this.predictionRes = predictionRes;
     }
-    public String getDate() {
-        return date;
+    public int getPredictionProbability() {
+      return predictionProbability;
     }
-    public void setDate(String date) {
-        this.date = date;
+    public void setPredictionProbability(int predictionProbability) {
+      this.predictionProbability = predictionProbability;
+    }
+    public String getDate() {
+        return dateOfCreation;
+    }
+    public void setDate(String dateOfCreation) {
+        this.dateOfCreation = dateOfCreation;
     }
 }

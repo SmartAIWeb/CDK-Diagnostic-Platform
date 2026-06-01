@@ -16,8 +16,9 @@ CREATE TABLE Users (
 CREATE TABLE History (
   history_id INT AUTO_INCREMENT PRIMARY KEY,
   user_id INT,
-  input_data JSON,
-  prediction_res JSON,
-  date DATETIME DEFAULT CURRENT_TIMESTAMP,
+  inputed_features JSON,
+  prediction_res boolean,
+  prediction_probability INT,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );

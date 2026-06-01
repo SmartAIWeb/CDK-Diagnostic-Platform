@@ -92,7 +92,7 @@ public class DAOClass {
 
   public ArrayList<Prediction> getUserHistory(int userId) throws SQLException {
     ArrayList<Prediction> historyList = new ArrayList<>();
-    String sql = "SELECT * FROM History WHERE user_id = ? ORDER BY date DESC";
+    String sql = "SELECT * FROM History WHERE user_id = ? ORDER BY created_at DESC";
     try(PreparedStatement stmt = connection.prepareStatement(sql)) {
       stmt.setInt(1, userId);
       try (ResultSet rs = stmt.executeQuery()) {
@@ -100,9 +100,10 @@ public class DAOClass {
           Prediction pre = new Prediction();
           pre.setHistoryId(rs.getInt("history_id"));
           pre.setUserId(rs.getInt("user_id"));
-          pre.setInputData(rs.getString("input_data"));
-          pre.setPredictionRes(rs.getString("prediction_res"));
-          pre.setDate(rs.getString("date"));
+          pre.setInputFeatures(rs.getString("inputed_features"));
+          pre.setPredictionRes(rs.getInt("prediction_res"));
+          pre.setPredictionProbability(rs.getInt("prediction_probability"));
+          pre.setDate(rs.getString("created_at"));
           historyList.add(pre);
         }
       }
@@ -140,16 +141,17 @@ public class DAOClass {
     return allusers ; 
   }
   
-  public boolean insertNewPrediction(int userId, String features, String predictionRes) 
+  public boolean insertNewPrediction(int userId, String features, int predictionRes, int PredictionProbability ) 
       throws SQLException {
     String sql = 
-      "INSERT INTO History (user_id, input_data, prediction_res)" +
-      "VALUES (?, ?, ?)";
+      "INSERT INTO History (user_id, inputed_features, prediction_res, prediction_probability)" +
+      "VALUES (?, ?, ?, ?)";
 
       try(PreparedStatement stmt = connection.prepareStatement(sql)) {
         stmt.setInt(1, userId);
         stmt.setString(2, features);
-        stmt.setString(3, predictionRes);
+        stmt.setInt(3, predictionRes);
+        stmt.setInt(4, PredictionProbability);
         return stmt.executeUpdate() != 0;
       }
   }

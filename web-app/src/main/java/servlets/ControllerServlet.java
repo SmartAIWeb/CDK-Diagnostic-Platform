@@ -18,6 +18,10 @@ import java.util.Base64;
 import java.util.concurrent.ConcurrentHashMap;
 import java.io.IOException;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import java.util.Collections;
 import java.net.*;
 import java.util.*;
@@ -152,17 +156,33 @@ public class ControllerServlet extends HttpServlet {
     try {
       URL url = new URL(System.getenv("ML_API_URL"));
       HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-      String features = buildFeaturesJson(req);
+
+      String unprocessedFeatures = extractFeaturesFromReq(req);
+      String processedFeatures = buildEncodedJsonFeatures(req);
+
       conn.setRequestMethod("POST");
       conn.setRequestProperty("Content-Type", "application/json");
       conn.setDoOutput(true);
-      conn.getOutputStream().write(features.getBytes("UTF-8"));
+      conn.getOutputStream().write(processedFeatures.getBytes("UTF-8"));
+
       Scanner scanner = new Scanner(conn.getInputStream()).useDelimiter("\\A");
       String predictionRes = scanner.hasNext() ? scanner.next() : " ";
-      req.setAttribute("prediction_result", predictionRes);
+      JsonObject predictionResJson = new Gson().fromJson(predictionRes, JsonObject.class);
+
+      int prediction_value = predictionResJson.get("prediction").getAsInt();
+      int prediction_probability = predictionResJson.get("probability").getAsInt();
+
+      req.setAttribute("prediction_result", prediction_value);
+      req.setAttribute("prediction_probability", prediction_probability);
+
       conn.disconnect();
       if(!predictionRes.trim().equals(""))
-        db.insertNewPrediction(currentUser.getUserId(), features, predictionRes);
+        db.insertNewPrediction(
+          currentUser.getUserId(),
+          unprocessedFeatures, 
+          prediction_value,
+          prediction_probability
+        );
     } catch (Exception e) {
       req.setAttribute("error_msg", "Error with the Flask API: " + e.getMessage());
       return req.getRequestDispatcher("/error.jsp");
@@ -263,13 +283,14 @@ public class ControllerServlet extends HttpServlet {
     for (String o : opts) f[i++] = o.equals(v) ? 1.0 : 0.0;
   }
 
-  private String buildFeaturesJson(HttpServletRequest req) {
-    double[] features = new double[44];
+
+  private String buildEncodedJsonFeatures(HttpServletRequest req) {
     String[] numFields = {
       "age","blood_pressure","urine_specific_gravity","albumin","sugar",
       "blood_glucose_random","blood_urea","serum_creatinine","sodium","potassium",
       "hemoglobin","packed_cell_volume","white_blood_cell_count","red_blood_cell_count"
     };
+    double[] features = new double[44];
     for (int i = 0; i < numFields.length; i++)
       features[i] = parseOrDefault(req, numFields[i]);
 
@@ -289,6 +310,74 @@ public class ControllerServlet extends HttpServlet {
     payload.put("nom_de_modele", "random_forest.pkl");
     payload.put("features", features);
     return new Gson().toJson(payload);
+  }
+
+  static String[] allFeatures = {
+    "age", "blood_pressure", "urine_specific_gravity", "albumin", "sugar",
+    "blood_glucose_random", "blood_urea", "serum_creatinine", "sodium", "potassium",
+    "hemoglobin", "packed_cell_volume", "white_blood_cell_count", "red_blood_cell_count",
+    "red_blood_cells_urine", "pus_cells", "pus_cell_clumps", "bacteria",
+    "hypertension", "diabetes_mellitus", "coronary_artery_disease", "appetite",
+    "pedal_edema", "anemia"
+  };
+
+  public static String extractFeaturesFromReq(HttpServletRequest request) {
+    JsonObject json = new JsonObject();
+
+    for (String field : allFeatures) {
+      String raw = request.getParameter(field);
+      if (raw != null && !raw.isBlank()) {
+        try {
+          if (!raw.contains(".")) {
+            json.addProperty(field, Long.parseLong(raw.trim()));
+          } else {
+            json.addProperty(field, Double.parseDouble(raw.trim()));
+          }
+        } catch (NumberFormatException e) {
+          json.addProperty(field, raw.trim());
+        }
+      }
+    }
+
+    return new Gson().toJson(json);
+  }
+
+  private Map<String, String> parseFeaturesJson(String json) {
+    Map<String, String> params = new LinkedHashMap<>();
+
+    JsonObject payload = JsonParser.parseString(json).getAsJsonObject();
+    JsonArray featuresArr = payload.getAsJsonArray("features");
+    double[] features = new double[featuresArr.size()];
+    for (int i = 0; i < features.length; i++)
+      features[i] = featuresArr.get(i).getAsDouble();
+
+    for (int i = 0; i < allFeatures.length; i++)
+      params.put(allFeatures[i], String.valueOf(features[i]));
+
+    reverseOneHot(params, "red_blood_cells_urine", features, 14, "missing", "normal", "abnormal");
+    reverseOneHot(params, "pus_cells", features, 17, "normal", "abnormal", "missing");
+    reverseOneHot(params, "pus_cell_clumps", features, 20, "notpresent", "present", "missing");
+    reverseOneHot(params, "bacteria", features, 23, "notpresent", "present", "missing");
+    reverseOneHot(params, "hypertension", features, 26, "yes", "no", "missing");
+    reverseOneHot(params, "diabetes_mellitus", features, 29, "yes", "no", "missing");
+    reverseOneHot(params, "coronary_artery_disease", features, 32, "no", "yes", "missing");
+    reverseOneHot(params, "appetite", features, 35, "good", "poor", "missing");
+    reverseOneHot(params, "pedal_edema", features, 38, "no", "yes", "missing");
+    reverseOneHot(params, "anemia", features, 41, "no", "yes", "missing");
+
+    return params;
+  }
+
+  private void reverseOneHot(Map<String, String> params, String key, double[] features, int startIndex, String... opts) {
+    String resolved = null;
+    for (int i = 0; i < opts.length; i++) {
+      if (features[startIndex + i] == 1.0) {
+        resolved = opts[i];
+        break;
+      }
+    }
+    if (resolved != null && !resolved.equals("missing"))
+      params.put(key, resolved);
   }
 
   Cookie createSessionTokenCookie(String sessionToken) {
