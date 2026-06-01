@@ -149,7 +149,7 @@ public class ControllerServlet extends HttpServlet {
     }
     req.setAttribute("user_info", loggedInUsers.get(userToken));
     try {
-      URL url = new URL("http://localhost:5000/predict");
+      URL url = new URL(System.getenv("ML_API_URL"));
       HttpURLConnection conn = (HttpURLConnection) url.openConnection();
       conn.setRequestMethod("POST");
       conn.setRequestProperty("Content-Type", "application/json");
@@ -163,7 +163,7 @@ public class ControllerServlet extends HttpServlet {
       req.setAttribute("error_msg", "Error with the Flask API: " + e.getMessage());
       return req.getRequestDispatcher("/error.jsp");
     }
-    return req.getRequestDispatcher("/prediction.jsp");
+    return req.getRequestDispatcher("/predict.jsp");
   }
 
   RequestDispatcher handleHistory(HttpServletRequest req, HttpServletResponse res) 
@@ -260,7 +260,7 @@ public class ControllerServlet extends HttpServlet {
   }
 
   private String buildFeaturesJson(HttpServletRequest req) {
-    double[] features = new double[45];
+    double[] features = new double[44];
     String[] numFields = {
       "age","blood_pressure","urine_specific_gravity","albumin","sugar",
       "blood_glucose_random","blood_urea","serum_creatinine","sodium","potassium",
@@ -280,7 +280,11 @@ public class ControllerServlet extends HttpServlet {
     oneHotFeatures(req, "pedal_edema", features, 38, "no","yes","missing");
     oneHotFeatures(req, "anemia", features, 41, "no","yes","missing");
 
-    return new Gson().toJson(Collections.singletonMap("features", features));
+    Map<String, Object> payload = new HashMap<>();
+    payload.put("request_type", "prediction");
+    payload.put("nom_de_modele", "random_forest.pkl");
+    payload.put("features", features);
+    return new Gson().toJson(payload);
   }
 
   Cookie createSessionTokenCookie(String sessionToken) {

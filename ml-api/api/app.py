@@ -6,14 +6,7 @@ import os
 
 app = Flask(__name__)
 
-with open("features.json", "r") as f:
-    FEATURE_ORDER = json.load(f)["feature_order"]
-
 modele_cache = {}
-
-def reordering_features(user_info):
-    # Reordering the features to match the training order
-    return [user_info[col] for col in FEATURE_ORDER]
 
 @app.route('/')
 def home():
@@ -25,14 +18,14 @@ def predict():
         data = request.get_json()
 
         # eviter le crash si une cle manque dans le JSON
-        if not data or "request_type" not in data or "nom_de_modele" not in data or "user_info" not in data:
+        if not data or "request_type" not in data or "nom_de_modele" not in data or "features" not in data:
             return jsonify({"error": "invalid request format(missing keys)"}), 400
 
         if data["request_type"] != "prediction":
             return jsonify({"error": "invalid request_type value"}), 400
 
         modele_name = data['nom_de_modele']
-        features = reordering_features(data['user_info'])
+        features = data['features']
         donner_du_modele = np.array([features])
 
         # optimisation de performance 
@@ -53,17 +46,21 @@ def predict():
 
         # L'execution de la prediction
         prediction = notre_modele.predict(donner_du_modele)[0]
+        probability = notre_modele.predict_proba(donner_du_modele)[0]
 
         # La conversion du type NumPy vers Python pour le Json
         if hasattr(prediction, "item"):
             prediction = prediction.item()
 
         # Retour succes avec le status 200
-        return jsonify({"prediction": prediction}), 200
+        return jsonify({
+            "prediction": prediction,
+            "probability": round(float(max(probability)) * 100, 2)
+        }), 200
 
     except Exception as e:
         # Retour erreur avec le status 400
         return jsonify({"error": str(e)}), 400
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+    app.run(debug=True, host="0.0.0.0", port=5000)
