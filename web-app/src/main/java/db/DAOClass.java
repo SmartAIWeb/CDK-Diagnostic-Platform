@@ -157,7 +157,7 @@ public class DAOClass {
       }
   }
   public void createModRequest(int userId, String message) throws SQLException {
-    String sql = "INSERT INTO moderation_requests (user_id, message) VALUES (?, ?)";
+    String sql = "INSERT INTO Admin_requests (user_id, message) VALUES (?, ?)";
     try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
         pstmt.setInt(1, userId);
         pstmt.setString(2, message);
@@ -193,7 +193,7 @@ public class DAOClass {
       }
     }
     public void updateRequestStatus(int requestId, String status) throws SQLException {
-    String sql = "UPDATE moderation_requests SET status = ? WHERE id = ?";
+    String sql = "UPDATE Admin_requests SET status = ? WHERE id = ?";
     try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
         pstmt.setString(1, status);
         pstmt.setInt(2, requestId);
