@@ -67,9 +67,51 @@
           </tbody>
         </table>
       </div>
+      <div class="table-container">
+        <h2>Demandes de Administration en attente</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Email</th>
+              <th>Message</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <c:choose>
+              <c:when test="${not empty mod_requests}">
+                <c:forEach var="req" items="${mod_requests}">
+                  <tr>
+                    <td>${req.email}</td>
+                    <td>${req.message}</td>
+                    <td>
+                      <form action="controller" method="POST" >
+                        <input type="hidden" name="request_type" value="approve_moderator">
+                        <input type="hidden" name="request_id" value="${req.id}">
+                        <input type="hidden" name="user_id" value="${req.userId}">
+                        <button type="submit">Approuver</button>
+                      </form>
+
+                      <form action="controller" method="POST" ">
+                        <input type="hidden" name="request_type" value="reject_moderator">
+                        <input type="hidden" name="request_id" value="${req.id}">
+                        <button type="submit">Rejeter</button>
+                      </form>
+                    </td>
+                  </tr>
+                </c:forEach>
+              </c:when>
+              <c:otherwise>
+                <tr>
+                  <td colspan="3">Aucune demande en attente.</td>
+                </tr>
+              </c:otherwise>
+            </c:choose>
+          </tbody>
+        </table>
+      </div>
     </section>
   </main>
-
   <footer data-year="2026"></footer>
 </body>
 </html>
