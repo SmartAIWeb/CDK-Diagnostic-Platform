@@ -5,6 +5,7 @@
     <title>Inscription</title>
 </head>
 <body>
+    <%@ include file="header.jsp" %>
     <h2>Creer un compte</h2>
     <%  
         if(request.getAttribute("error_msg")!=null){ %>

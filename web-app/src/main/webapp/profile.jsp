@@ -6,6 +6,7 @@
   <title>Mon Profil</title>
 </head>
 <body>
+  <%@ include file="header.jsp" %>
   <h2>Profil Utilisateur</h2>
   <%User user = (User) request.getAttribute("user_info");%>
   <%if(user!=null) { %>

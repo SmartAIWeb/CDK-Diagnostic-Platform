@@ -6,6 +6,7 @@
     <title>Administration</title>
 </head>
 <body>
+    <%@ include file="header.jsp" %>
     <h1>Tableau de bord Administrateur</h1>
     <nav>
         <a href="admin.jsp">Rafraichir la liste</a> |

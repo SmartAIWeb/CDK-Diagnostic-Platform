@@ -5,7 +5,8 @@
     <title>Inscription</title>
 </head>
 <body>
-    <h2>Connection</h2>
+    <%@ include file="header.jsp" %>
+    <h2>Connexion</h2>
     <%  
         if(request.getAttribute("error_msg")!=null){ %>
             <p><%= request.getAttribute("error_msg") %></p>
