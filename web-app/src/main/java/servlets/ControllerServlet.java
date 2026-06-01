@@ -248,6 +248,7 @@ public class ControllerServlet extends HttpServlet {
     if (userToken != null && loggedInUsers.containsKey(userToken)) {
       User oldUserInfo = loggedInUsers.get(userToken);
       User targetUser = parseUserInfo(req);
+      req.setAttribute("user_info", oldUserInfo);
       if(oldUserInfo.getEmail().equals(targetUser.getEmail())) {
         if(db.updateUserInfo(targetUser)) {
           User updatedUserInfo = db.getUser(oldUserInfo.getEmail());
@@ -256,17 +257,17 @@ public class ControllerServlet extends HttpServlet {
           req.setAttribute("user_info", updatedUserInfo);
           return req.getRequestDispatcher("/profile.jsp");
         } else {
-          req.setAttribute("error_msg", "Failed to update user profile");
+          req.setAttribute("error_msg", "Database update failed");
+          return req.getRequestDispatcher("/profile.jsp");
         }
       } else {
         req.setAttribute("error_msg", "Email cannot be changed");
         return req.getRequestDispatcher("/profile.jsp");
       }
     } else {
-      req.setAttribute("error_msg", "Failed to update user profile");
+      req.setAttribute("error_msg", "Session expired");
       return req.getRequestDispatcher("/login.jsp");
     }
-    return req.getRequestDispatcher("/profile.jsp");
   }
 
 
