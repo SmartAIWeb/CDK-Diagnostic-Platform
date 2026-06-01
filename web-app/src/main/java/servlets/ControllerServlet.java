@@ -56,6 +56,8 @@ public class ControllerServlet extends HttpServlet {
         rd = handleAdmin(req, res);
       } else if("logout".equals(requestType)) {
         rd = handleLogout(req, res);
+      } else if("predict".equals(requestType)) {
+        rd = req.getRequestDispatcher("/predict.jsp");
       } else {
         rd = req.getRequestDispatcher("/error.jsp");
         req.setAttribute("error_msg", "Unsupported Request Type");
