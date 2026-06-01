@@ -61,6 +61,7 @@
           <button type="button" id="cancelBtn" hidden onclick="cancelEdit()">Annuler</button>
         </div>
       </form>
+      <a href="bemoderator.jsp" class="btn-link">Devenir Moderateur</a>
     </section>
   </main>
 
