@@ -241,15 +241,21 @@ public class ControllerServlet extends HttpServlet {
       throws SQLException {
     String userToken = getSessionToken(req);
     if (userToken != null && loggedInUsers.containsKey(userToken)) {
+      User oldUserInfo = loggedInUsers.get(userToken);
       User targetUser = parseUserInfo(req);
-      if(db.updateUserInfo(targetUser)) {
-        User oldUserInfo = loggedInUsers.get(userToken);
-        User updatedUserInfo = db.getUser(oldUserInfo.getEmail());
-        loggedInUsers.put(userToken, updatedUserInfo);
-        req.setAttribute("user_info", updatedUserInfo);
-        return req.getRequestDispatcher("/profile.jsp");
+      if(oldUserInfo.getEmail().equals(targetUser.getEmail())) {
+        if(db.updateUserInfo(targetUser)) {
+          User updatedUserInfo = db.getUser(oldUserInfo.getEmail());
+          updatedUserInfo.setPassword(null);
+          loggedInUsers.put(userToken, updatedUserInfo);
+          req.setAttribute("user_info", updatedUserInfo);
+          return req.getRequestDispatcher("/profile.jsp");
+        } else {
+          req.setAttribute("error_msg", "Failed to update user profile");
+        }
       } else {
-        req.setAttribute("error_msg", "Failed to update user profile");
+        req.setAttribute("error_msg", "Email cannot be changed");
+        return req.getRequestDispatcher("/profile.jsp");
       }
     } else {
       req.setAttribute("error_msg", "Failed to update user profile");
