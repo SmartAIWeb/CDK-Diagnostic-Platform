@@ -348,32 +348,6 @@ public class ControllerServlet extends HttpServlet {
     return new Gson().toJson(json);
   }
 
-  private Map<String, String> parseFeaturesJson(String json) {
-    Map<String, String> params = new LinkedHashMap<>();
-
-    JsonObject payload = JsonParser.parseString(json).getAsJsonObject();
-    JsonArray featuresArr = payload.getAsJsonArray("features");
-    double[] features = new double[featuresArr.size()];
-    for (int i = 0; i < features.length; i++)
-      features[i] = featuresArr.get(i).getAsDouble();
-
-    for (int i = 0; i < allFeatures.length; i++)
-      params.put(allFeatures[i], String.valueOf(features[i]));
-
-    reverseOneHot(params, "red_blood_cells_urine", features, 14, "missing", "normal", "abnormal");
-    reverseOneHot(params, "pus_cells", features, 17, "normal", "abnormal", "missing");
-    reverseOneHot(params, "pus_cell_clumps", features, 20, "notpresent", "present", "missing");
-    reverseOneHot(params, "bacteria", features, 23, "notpresent", "present", "missing");
-    reverseOneHot(params, "hypertension", features, 26, "yes", "no", "missing");
-    reverseOneHot(params, "diabetes_mellitus", features, 29, "yes", "no", "missing");
-    reverseOneHot(params, "coronary_artery_disease", features, 32, "no", "yes", "missing");
-    reverseOneHot(params, "appetite", features, 35, "good", "poor", "missing");
-    reverseOneHot(params, "pedal_edema", features, 38, "no", "yes", "missing");
-    reverseOneHot(params, "anemia", features, 41, "no", "yes", "missing");
-
-    return params;
-  }
-
   private void reverseOneHot(Map<String, String> params, String key, double[] features, int startIndex, String... opts) {
     String resolved = null;
     for (int i = 0; i < opts.length; i++) {
