@@ -17,6 +17,6 @@
       <a href="register.jsp">Inscription</a>
     <% } %>
   </nav>
-  <link rel="stylesheet" href="css/header.css">
+  <link rel="stylesheet" href="css/style.css">
 </header>
 <hr>

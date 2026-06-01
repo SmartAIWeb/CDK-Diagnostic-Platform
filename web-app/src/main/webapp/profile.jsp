@@ -13,7 +13,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Mon Profil</title>
-  <link rel="stylesheet" href="css/profile.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <%@ include file="header.jsp" %>

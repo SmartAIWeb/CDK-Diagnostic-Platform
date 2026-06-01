@@ -4,12 +4,15 @@
 <head>
   <meta charset="UTF-8">
   <title>Prediction - Maladie Renale Chronique</title>
-  <link rel="stylesheet" href="css/predict.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <%@ include file="header.jsp" %>
-
   <main>
+    <div class="hero">
+        <h1>Chronic Kidney Disease Prediction System</h1>
+        <p>Plateforme intelligente d'aide au diagnostic basée sur le Machine Learning</p>
+    </div>
     <section class="predict-container">
       <h2>Formulaire de Prediction - Maladie Renale Chronique</h2>
 

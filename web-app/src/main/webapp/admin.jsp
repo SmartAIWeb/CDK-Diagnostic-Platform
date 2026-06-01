@@ -14,7 +14,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Administration</title>
-  <link rel="stylesheet" href="css/admin.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <%@ include file="header.jsp" %>

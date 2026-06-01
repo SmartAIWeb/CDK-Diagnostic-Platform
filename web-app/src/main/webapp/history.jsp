@@ -22,7 +22,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Historique des Predictions</title>
-  <link rel="stylesheet" href="css/history.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <%@ include file="header.jsp" %>

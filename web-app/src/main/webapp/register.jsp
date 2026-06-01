@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Inscription</title>
-  <link rel="stylesheet" href="css/register.css">
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <%@ include file="header.jsp" %>
