@@ -44,8 +44,6 @@ public class ControllerServlet extends HttpServlet {
     try {
       if("profile".equals(requestType)) {
         rd = handleProfile(req,res);
-      } else if("predict".equals(requestType)) {
-        rd = handlePrediction(req, res);
       } else if("history".equals(requestType)) {
         rd = handleHistory(req, res);
       } else if("admin".equals(requestType)) {
@@ -77,6 +75,8 @@ public class ControllerServlet extends HttpServlet {
         rd = handleLogin(req, res);
       } else if("edit_info".equals(requestType)) {
         rd = handleEditUserProfile(req, res);
+      } else if("predict".equals(requestType)) {
+        rd = handlePrediction(req, res);
       } else {
         rd = req.getRequestDispatcher("/error.jsp");
         req.setAttribute("error_msg", "Unsupported Request Type");
