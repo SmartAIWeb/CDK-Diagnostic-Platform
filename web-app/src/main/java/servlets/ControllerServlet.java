@@ -85,6 +85,14 @@ public class ControllerServlet extends HttpServlet {
         rd = handleEditUserProfile(req, res);
       } else if("predict".equals(requestType)) {
         rd = handlePrediction(req, res);
+      } else if("submit_mod_request".equals(requestType)) {
+        rd = handleSubmitModRequest(req, res);
+      } else if("approve_moderator".equals(requestType)) { 
+        handleApproveModerator(req, res);
+        return ;
+      } else if("reject_moderator".equals(requestType)) { 
+        handleRejectModerator(req, res);
+        return ;
       } else {
         rd = req.getRequestDispatcher("/error.jsp");
         req.setAttribute("error_msg", "Unsupported Request Type");
@@ -233,6 +241,8 @@ public class ControllerServlet extends HttpServlet {
         req.setAttribute("user_info", currentUser);
         ArrayList<User> AllUsers = db.getAllUsers();
         req.setAttribute("all_users",AllUsers);
+        ArrayList<AdminRequest> ModRequest = db.getPendingModRequests();
+        req.setAttribute("mod_requests", db.getPendingModRequests());
         return req.getRequestDispatcher("/admin.jsp");
       } else {
         req.setAttribute("error_msg", "Access denied: Admins only");
@@ -285,6 +295,38 @@ public class ControllerServlet extends HttpServlet {
     return req.getRequestDispatcher("/login.jsp");
   }
 
+ RequestDispatcher handleSubmitModRequest(HttpServletRequest req, HttpServletResponse res) 
+  throws SQLException {
+    String userToken = getSessionToken(req);
+    if (userToken == null || !loggedInUsers.containsKey(userToken)) {
+        return req.getRequestDispatcher("/login.jsp");
+    }
+    User currentUser = loggedInUsers.get(userToken);
+    String message = req.getParameter("message");
+    try {
+        db.createModRequest(currentUser.getUserId(), message);
+        req.setAttribute("msg", "Votre demande a ete envoyee aux administrateurs.");
+    } catch (Exception e) {
+        req.setAttribute("error_msg", "Error sending: " + e.getMessage());
+    }
+    return req.getRequestDispatcher("/profile.jsp");
+}
+
+  public void  handleApproveModerator(HttpServletRequest req, HttpServletResponse res)
+    throws SQLException, IOException {
+      int requestId = Integer.parseInt(req.getParameter("request_id"));
+      int userId = Integer.parseInt(req.getParameter("user_id"));
+      db.updateUserRole(userId, "admin");
+      db.updateRequestStatus(requestId, "approved");
+      res.sendRedirect("/controller?request_type=admin");
+  }
+
+  public void  handleRejectModerator(HttpServletRequest req, HttpServletResponse res) 
+  throws SQLException, IOException{
+    int requestId = Integer.parseInt(req.getParameter("request_id"));
+    db.updateRequestStatus(requestId, "rejected");
+    res.sendRedirect("/controller?request_type=admin");
+}
   private double parseOrDefault(HttpServletRequest req, String k) {
     String v = req.getParameter(k);
     return (v == null || v.isEmpty()) 
