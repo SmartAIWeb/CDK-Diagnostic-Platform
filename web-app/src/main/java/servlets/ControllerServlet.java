@@ -17,6 +17,8 @@ import java.sql.SQLException;
 import java.util.Base64;
 import java.util.concurrent.ConcurrentHashMap;
 import java.io.IOException;
+import com.google.gson.Gson;
+import java.util.Collections;
 import java.net.*;
 import java.util.*;
 
@@ -145,8 +147,8 @@ public class ControllerServlet extends HttpServlet {
       User currentUser = loggedInUsers.get(userToken);
       req.setAttribute("user_info" , currentUser);
       try{
-        String jsonPayload = req.getParameter("json_data");
-        //la connection au api 
+        String postedFeatures = buildFeaturesJson(req);
+        //la connection au api
         URL url = new URL("http://localhost:5000/predict");
         HttpURLConnection conn= (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
@@ -154,10 +156,10 @@ public class ControllerServlet extends HttpServlet {
         conn.setDoOutput(true);
 
         //Envoi du json au api 
-        conn.getOutputStream().write(jsonPayload.getBytes("UTF-8"));
+        conn.getOutputStream().write(postedFeatures.getBytes("UTF-8"));
 
         Scanner sc = new Scanner(conn.getInputStream()).useDelimiter("\\A");
-        String predictionresult =sc.hasNext() ? sc.next() : "";
+        String predictionresult = sc.hasNext() ? sc.next() : "";
         sc.close();
         req.setAttribute("prediction_result",predictionresult);
         conn.disconnect();
@@ -170,7 +172,8 @@ public class ControllerServlet extends HttpServlet {
       return req.getRequestDispatcher("/login.jsp"); 
     }
   }
-RequestDispatcher handleHistory(HttpServletRequest req, HttpServletResponse res) 
+
+  RequestDispatcher handleHistory(HttpServletRequest req, HttpServletResponse res) 
       throws SQLException{
     String userToken = getSessionToken(req);
     if (userToken != null && loggedInUsers.containsKey(userToken)) {
@@ -194,7 +197,7 @@ RequestDispatcher handleHistory(HttpServletRequest req, HttpServletResponse res)
         req.setAttribute("error_msg", "Access denied, please log in first");
         return req.getRequestDispatcher("/login.jsp");
     }
-}
+  }
 
   RequestDispatcher handleAdmin(HttpServletRequest req , HttpServletResponse res) 
       throws SQLException {
@@ -249,6 +252,42 @@ RequestDispatcher handleHistory(HttpServletRequest req, HttpServletResponse res)
       req.setAttribute("error_msg", "Please log in first");
     }
     return req.getRequestDispatcher("/login.jsp");
+  }
+
+  private double parseOrDefault(HttpServletRequest req, String k) {
+    String v = req.getParameter(k);
+    return (v == null || v.isEmpty()) 
+      ? 0.0 
+     : Double.parseDouble(v);
+  }
+
+  private void oneHotFeatures(HttpServletRequest req, String k, double[] f, int i, String... opts) {
+    String v = req.getParameter(k);
+    for (String o : opts) f[i++] = o.equals(v) ? 1.0 : 0.0;
+  }
+
+  private String buildFeaturesJson(HttpServletRequest req) {
+    double[] features = new double[45];
+    String[] numFields = {
+      "age","blood_pressure","urine_specific_gravity","albumin","sugar",
+      "blood_glucose_random","blood_urea","serum_creatinine","sodium","potassium",
+      "hemoglobin","packed_cell_volume","white_blood_cell_count","red_blood_cell_count"
+    };
+    for (int i = 0; i < numFields.length; i++)
+      features[i] = parseOrDefault(req, numFields[i]);
+
+    oneHotFeatures(req, "red_blood_cells_urine", features, 14, "missing","normal","abnormal");
+    oneHotFeatures(req, "pus_cells", features, 17, "normal","abnormal","missing");
+    oneHotFeatures(req, "pus_cell_clumps", features, 20, "notpresent","present","missing");
+    oneHotFeatures(req, "bacteria", features, 23, "notpresent","present","missing");
+    oneHotFeatures(req, "hypertension", features, 26, "yes","no","missing");
+    oneHotFeatures(req, "diabetes_mellitus", features, 29, "yes","no","missing");
+    oneHotFeatures(req, "coronary_artery_disease", features, 32, "no","yes","missing");
+    oneHotFeatures(req, "appetite", features, 35, "good","poor","missing");
+    oneHotFeatures(req, "pedal_edema", features, 38, "no","yes","missing");
+    oneHotFeatures(req, "anemia", features, 41, "no","yes","missing");
+
+    return new Gson().toJson(Collections.singletonMap("features", features));
   }
 
   Cookie createSessionTokenCookie(String sessionToken) {
