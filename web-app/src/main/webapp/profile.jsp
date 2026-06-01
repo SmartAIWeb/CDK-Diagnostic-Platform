@@ -1,47 +1,102 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="beans.User" %>
+<%
+  User user = (User) request.getAttribute("user_info");
+  if (user == null) {
+%>
+  <jsp:forward page="login.jsp" />
+<%
+  }
+%>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
+  <meta charset="UTF-8">
   <title>Mon Profil</title>
+  <link rel="stylesheet" href="css/profile.css">
 </head>
 <body>
   <%@ include file="header.jsp" %>
-  <h2>Profil Utilisateur</h2>
-  <%User user = (User) request.getAttribute("user_info");%>
-  <%if(user!=null) { %>
-    <form method="post" action="controller">
-      <input type="hidden" name="request_type" value="update_profile">
-      <input type="text" name="firstName" placeholder="Prenom" value="<%= user.getFirstName() %>" readonly required><br>
-      <input type="text" name="lastName" placeholder="Nom" value="<%= user.getLastName() %>" readonly required><br>
-      <input type="number" name="age" placeholder="Age" value="<%= user.getAge() %>" readonly><br>
-      <label>Genre:</label>
-      <select name="gender" disabled>
-        <option value="male" <%= "male".equals(user.getGender()) ? "selected" : "" %>>Masculin</option>
-        <option value="female" <%= "female".equals(user.getGender()) ? "selected" : "" %>>Feminin</option>
-      </select><br>
-      <input type="email" name="email" placeholder="Email" value="<%= user.getEmail() %>" readonly required><br>
-      <input type="password" name="password" placeholder="Mot de passe" readonly><br>
-      <button type="button" id="editBtn" onclick="toggleEdit()">Modifier</button>
-      <button type="submit" id="submitBtn" style="display:none">Enregistrer</button>
-    </form>
-    <script>
-      function toggleEdit() {
-        document.querySelectorAll('input').forEach(i => i.removeAttribute('readonly'));
-        document.querySelector('select').removeAttribute('disabled');
-        document.getElementById('editBtn').style.display = 'none';
-        document.getElementById('submitBtn').style.display = '';
-      }
-    </script>
-    <hr>
-    <nav>
-      <a href="predict.jsp">Faire une prediction</a> |
-      <a href="history.jsp">Voir mon historique</a> |
-      <a href="controller?request_type=logout">Deconnexion</a>
-    </nav>
-  <% } else { %>
-    <p>Erreur: Impossible de charger les informations du profil</p>
-    <a href="login.jsp">Retour a la connexion</a>
-  <% } %>
+
+  <main>
+    <section class="profile-container">
+      <h2>Profil Utilisateur</h2>
+
+      <% if (request.getAttribute("error_msg") != null) { %>
+        <div class="error-message">
+          <p><%= request.getAttribute("error_msg") %></p>
+        </div>
+      <% } %>
+
+      <form method="POST" action="controller">
+        <input type="hidden" name="request_type" value="edit_info">
+
+        <div class="form-group">
+          <label for="firstName">Prenom :</label>
+          <input type="text" id="firstName" name="firstName" value="<%= user.getFirstName() != null ? user.getFirstName() : "" %>" readonly required>
+        </div>
+
+        <div class="form-group">
+          <label for="lastName">Nom :</label>
+          <input type="text" id="lastName" name="lastName" value="<%= user.getLastName() != null ? user.getLastName() : "" %>" readonly required>
+        </div>
+
+        <div class="form-group">
+          <label for="age">Age :</label>
+          <input type="number" id="age" name="age" value="<%= user.getAge() %>" readonly min="0" max="150">
+        </div>
+
+        <div class="form-group">
+          <label for="gender">Genre :</label>
+          <select id="gender" name="gender" disabled>
+            <option value="male"   <%= "male".equals(user.getGender())   ? "selected" : "" %>>Masculin</option>
+            <option value="female" <%= "female".equals(user.getGender()) ? "selected" : "" %>>Feminin</option>
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button type="button" id="editBtn" onclick="toggleEdit()">Modifier</button>
+          <button type="submit" id="submitBtn" hidden>Enregistrer</button>
+          <button type="button" id="cancelBtn" hidden onclick="cancelEdit()">Annuler</button>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <footer></footer>
+
+  <script>
+    var origValues = {};
+
+    function toggleEdit() {
+      ['firstName', 'lastName', 'age'].forEach(function(id) {
+        var el = document.getElementById(id);
+        origValues[id] = el.value;
+        el.removeAttribute('readonly');
+      });
+      var g = document.getElementById('gender');
+      origValues['gender'] = g.value;
+      g.removeAttribute('disabled');
+
+      document.getElementById('editBtn').hidden   = true;
+      document.getElementById('submitBtn').hidden = false;
+      document.getElementById('cancelBtn').hidden = false;
+    }
+
+    function cancelEdit() {
+      ['firstName', 'lastName', 'age'].forEach(function(id) {
+        var el = document.getElementById(id);
+        el.value = origValues[id];
+        el.setAttribute('readonly', 'readonly');
+      });
+      var g = document.getElementById('gender');
+      g.value = origValues['gender'];
+      g.setAttribute('disabled', 'disabled');
+
+      document.getElementById('editBtn').hidden   = false;
+      document.getElementById('submitBtn').hidden = true;
+      document.getElementById('cancelBtn').hidden = true;
+    }
+  </script>
 </body>
 </html>
