@@ -140,37 +140,30 @@ public class ControllerServlet extends HttpServlet {
     }
   }
 
-  RequestDispatcher handlePrediction(HttpServletRequest req , HttpServletResponse res) 
+  RequestDispatcher handlePrediction(HttpServletRequest req, HttpServletResponse res)
       throws SQLException {
-    String userToken=getSessionToken(req);
-    if (userToken!=null && loggedInUsers.containsKey(userToken)){
-      User currentUser = loggedInUsers.get(userToken);
-      req.setAttribute("user_info" , currentUser);
-      try{
-        String postedFeatures = buildFeaturesJson(req);
-        //la connection au api
-        URL url = new URL("http://localhost:5000/predict");
-        HttpURLConnection conn= (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", "application/json");
-        conn.setDoOutput(true);
-
-        //Envoi du json au api 
-        conn.getOutputStream().write(postedFeatures.getBytes("UTF-8"));
-
-        Scanner sc = new Scanner(conn.getInputStream()).useDelimiter("\\A");
-        String predictionresult = sc.hasNext() ? sc.next() : "";
-        sc.close();
-        req.setAttribute("prediction_result",predictionresult);
-        conn.disconnect();
-      }catch (Exception e) {
-          req.setAttribute("error_msg", "Error with the Flask API: " + e.getMessage());
-      }
-      return req.getRequestDispatcher("/predict.jsp");
-    }else{
-      req.setAttribute("error_msg", "Access denied , please log in first");
-      return req.getRequestDispatcher("/login.jsp"); 
+    String userToken = getSessionToken(req);
+    if (userToken == null || !loggedInUsers.containsKey(userToken)) {
+      req.setAttribute("error_msg", "Access denied, please log in first");
+      return req.getRequestDispatcher("/login.jsp");
     }
+    req.setAttribute("user_info", loggedInUsers.get(userToken));
+    try {
+      URL url = new URL("http://localhost:5000/predict");
+      HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+      conn.setRequestMethod("POST");
+      conn.setRequestProperty("Content-Type", "application/json");
+      conn.setDoOutput(true);
+      conn.getOutputStream().write(buildFeaturesJson(req).getBytes("UTF-8"));
+      Scanner sc = new Scanner(conn.getInputStream()).useDelimiter("\\A");
+      req.setAttribute("prediction_result", sc.hasNext() ? sc.next() : "");
+      sc.close();
+      conn.disconnect();
+    } catch (Exception e) {
+      req.setAttribute("error_msg", "Error with the Flask API: " + e.getMessage());
+      return req.getRequestDispatcher("/error.jsp");
+    }
+    return req.getRequestDispatcher("/prediction.jsp");
   }
 
   RequestDispatcher handleHistory(HttpServletRequest req, HttpServletResponse res) 
