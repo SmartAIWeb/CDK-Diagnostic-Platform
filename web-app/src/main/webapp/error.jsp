@@ -23,7 +23,8 @@
 
       <div class="error-actions">
         <a href="javascript:history.back()">Retour</a> |
-        <a href="profile.jsp">Accueil</a>
+        <a href="controller?request_type=profile">Mon Profil</a> | 
+        <a href="login.jsp">Connexion</a>
       </div>
     </section>
   </main>

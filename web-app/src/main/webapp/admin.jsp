@@ -2,11 +2,10 @@
 <%@ page import="beans.User" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%
-  User user = (User) request.getAttribute("user_info");
-  if (user == null) {
-%>
-  <jsp:forward page="login.jsp" />
-<%
+  User user = (User) session.getAttribute("user_info");
+  if (user == null || !"admin".equalsIgnoreCase(user.getRole())) {
+      response.sendRedirect("login.jsp");
+      return;
   }
 %>
 <!DOCTYPE html>
@@ -85,17 +84,17 @@
                     <td>${req.email}</td>
                     <td>${req.message}</td>
                     <td>
-                      <form action="controller" method="POST" >
+                      <form action="controller" method="POST" style="display:inline;">
                         <input type="hidden" name="request_type" value="approve_moderator">
                         <input type="hidden" name="request_id" value="${req.id}">
                         <input type="hidden" name="user_id" value="${req.userId}">
-                        <button type="submit">Approuver</button>
+                        <button type="submit" class="btn btn-approve">Approuver</button>
                       </form>
 
-                      <form action="controller" method="POST" ">
+                      <form action="controller" method="POST" style="display:inline;">
                         <input type="hidden" name="request_type" value="reject_moderator">
                         <input type="hidden" name="request_id" value="${req.id}">
-                        <button type="submit">Rejeter</button>
+                        <button type="submit" class="btn btn-reject">Rejeter</button>
                       </form>
                     </td>
                   </tr>

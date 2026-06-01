@@ -17,6 +17,13 @@
 
   int totalColumns = 4 + dynamicKeys.size();
 %>
+<%
+  User user = (User) session.getAttribute("user_info");
+  if (user == null) {
+      response.sendRedirect("login.jsp");
+      return;
+  }
+%>
 <!DOCTYPE html>
 <html lang="fr">
 <head>

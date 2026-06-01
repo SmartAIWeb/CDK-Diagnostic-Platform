@@ -1,4 +1,11 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="beans.User" %>
+<%
+  if (session.getAttribute("user_info") != null) {
+      response.sendRedirect("controller?request_type=profile");
+      return;
+  }
+%>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
