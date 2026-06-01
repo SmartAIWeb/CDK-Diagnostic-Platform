@@ -1,7 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="beans.User" %>
 <%
-  User user = (User) request.getAttribute("user_info");
+  User user = (User) session.getAttribute("user_info");
   if (user == null) {
 %>
   <jsp:forward page="login.jsp" />
@@ -61,7 +61,12 @@
           <button type="button" id="cancelBtn" hidden onclick="cancelEdit()">Annuler</button>
         </div>
       </form>
-      <a href="bemoderator.jsp" class="btn-link">Devenir Moderateur</a>
+      <% if (!"admin".equals(user.getRole())) { %>
+          <a href="bemoderator.jsp" class="btn-link">Devenir Moderateur</a>
+      <% } else { %>
+          <p style="color: blue;">Vous etes administrateur.</p>
+          <a href="controller?request_type=admin" class="btn-link">Accéder au Dashboard Admin</a>
+      <% } %>
     </section>
   </main>
 
