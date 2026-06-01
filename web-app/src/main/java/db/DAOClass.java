@@ -2,6 +2,7 @@ package db;
 
 import beans.User;
 import beans.Prediction;
+import beans.AdminRequest;
 
 import org.mindrot.jbcrypt.BCrypt;
 import java.sql.Connection;
@@ -154,5 +155,49 @@ public class DAOClass {
         stmt.setInt(4, PredictionProbability);
         return stmt.executeUpdate() != 0;
       }
+  }
+  public void createModRequest(int userId, String message) throws SQLException {
+    String sql = "INSERT INTO moderation_requests (user_id, message) VALUES (?, ?)";
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        pstmt.setInt(1, userId);
+        pstmt.setString(2, message);
+        pstmt.executeUpdate();
+    }
+  }
+  public ArrayList<AdminRequest> getPendingModRequests() throws SQLException {
+    ArrayList<AdminRequest> requests = new ArrayList<>();
+    String sql = "SELECT mr.id, mr.user_id, mr.message, u.email "+
+                 "FROM Admin_requests mr "+
+                 "JOIN Users u ON mr.user_id=u.user_id "+
+                 "WHERE mr.status='pending'";
+                 
+    try(Statement stmt = connection.createStatement();
+         ResultSet rs = stmt.executeQuery(sql)){
+        while (rs.next()) {
+            ModRequest req = new ModRequest();
+            req.setId(rs.getInt("id"));
+            req.setUserId(rs.getInt("user_id"));
+            req.setMessage(rs.getString("message"));
+            req.setEmail(rs.getString("email"));
+            requests.add(req);
+        }
+    }
+    return requests;
+}
+  public void updateUserRole(int userId, String role) throws SQLException {
+      String sql = "UPDATE Users SET role = ? WHERE user_id = ?";
+      try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+          pstmt.setString(1, role);
+          pstmt.setInt(2, userId);
+          pstmt.executeUpdate();
+      }
+    }
+    public void updateRequestStatus(int requestId, String status) throws SQLException {
+    String sql = "UPDATE moderation_requests SET status = ? WHERE id = ?";
+    try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+        pstmt.setString(1, status);
+        pstmt.setInt(2, requestId);
+        pstmt.executeUpdate();
+    }
   }
 }
