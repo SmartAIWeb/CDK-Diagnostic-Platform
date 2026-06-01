@@ -1186,3 +1186,30 @@ footer::after {
     padding: 28px 16px;
   }
 }
+.btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: 0.3s;
+    margin: 2px;
+}
+
+.btn-approve {
+    background-color: #00d4ff; 
+    color: #051a30; 
+}
+
+.btn-approve:hover {
+    background-color: #0088aa;
+}
+
+.btn-reject {
+    background-color: #ff4d4d;
+    color: white;
+}
+
+.btn-reject:hover {
+    background-color: #cc0000;
+}
