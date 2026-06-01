@@ -3,6 +3,7 @@ package servlets;
 import db.DAOClass;
 import beans.User;
 import beans.Prediction;
+import beans.AdminRequest;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.ServletException;
