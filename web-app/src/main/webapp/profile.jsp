@@ -63,7 +63,7 @@
     </section>
   </main>
 
-  <footer></footer>
+  <footer data-year="2026"></footer>
 
   <script>
     var origValues = {};

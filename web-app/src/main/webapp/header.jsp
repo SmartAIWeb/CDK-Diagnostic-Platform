@@ -7,16 +7,15 @@
 <header>
   <nav>
     <% if (currentUser != null) { %>
-      <a href="profile.jsp">Profil</a> |
-      <a href="predict.jsp">Prediction</a> |
-      <a href="controller?request_type=history">Historique</a> |
-      <% if (isAdmin) { %><a href="admin.jsp">Admin</a> |<% } %>
-      <a href="controller?request_type=logout">Deconnexion</a>
+      <a href="predict.jsp">Prédiction</a>
+      <a href="controller?request_type=history">Historique</a>
+      <a href="profile.jsp">Profil</a>
+      <% if (isAdmin) { %><a href="admin.jsp">Administration</a><% } %>
+      <a href="controller?request_type=logout">Déconnexion</a>
     <% } else { %>
-      <a href="login.jsp">Connexion</a> |
+      <a href="login.jsp">Connexion</a>
       <a href="register.jsp">Inscription</a>
     <% } %>
   </nav>
-  <link rel="stylesheet" href="css/style.css">
 </header>
-<hr>
+

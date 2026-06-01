@@ -41,6 +41,6 @@
     </section>
   </main>
 
-  <footer></footer>
+  <footer data-year="2026"></footer>
 </body>
 </html>
