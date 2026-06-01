@@ -139,5 +139,18 @@ public class DAOClass {
     }
     return allusers ; 
   }
+  
+  public boolean insertNewPrediction(int userId, String features, String predictionRes) 
+      throws SQLException {
+    String sql = 
+      "INSERT INTO History (user_id, input_data, prediction_res)" +
+      "VALUES (?, ?, ?)";
 
+      try(PreparedStatement stmt = connection.prepareStatement(sql)) {
+        stmt.setInt(1, userId);
+        stmt.setString(2, features);
+        stmt.setString(3, predictionRes);
+        return stmt.executeUpdate() != 0;
+      }
+  }
 }

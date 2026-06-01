@@ -147,18 +147,22 @@ public class ControllerServlet extends HttpServlet {
       req.setAttribute("error_msg", "Access denied, please log in first");
       return req.getRequestDispatcher("/login.jsp");
     }
-    req.setAttribute("user_info", loggedInUsers.get(userToken));
+    User currentUser = loggedInUsers.get(userToken);
+    req.setAttribute("user_info", currentUser);
     try {
       URL url = new URL(System.getenv("ML_API_URL"));
       HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+      String features = buildFeaturesJson(req);
       conn.setRequestMethod("POST");
       conn.setRequestProperty("Content-Type", "application/json");
       conn.setDoOutput(true);
-      conn.getOutputStream().write(buildFeaturesJson(req).getBytes("UTF-8"));
-      Scanner sc = new Scanner(conn.getInputStream()).useDelimiter("\\A");
-      req.setAttribute("prediction_result", sc.hasNext() ? sc.next() : "");
-      sc.close();
+      conn.getOutputStream().write(features.getBytes("UTF-8"));
+      Scanner scanner = new Scanner(conn.getInputStream()).useDelimiter("\\A");
+      String predictionRes = scanner.hasNext() ? scanner.next() : " ";
+      req.setAttribute("prediction_result", predictionRes);
       conn.disconnect();
+      if(!predictionRes.trim().equals(""))
+        db.insertNewPrediction(currentUser.getUserId(), features, predictionRes);
     } catch (Exception e) {
       req.setAttribute("error_msg", "Error with the Flask API: " + e.getMessage());
       return req.getRequestDispatcher("/error.jsp");
