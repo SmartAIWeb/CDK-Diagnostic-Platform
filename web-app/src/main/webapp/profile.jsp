@@ -16,8 +16,8 @@
       <input type="number" name="age" placeholder="Age" value="<%= user.getAge() %>" readonly><br>
       <label>Genre:</label>
       <select name="gender" disabled>
-        <option value="M" <%= "M".equals(user.getGender()) ? "selected" : "" %>>Masculin</option>
-        <option value="F" <%= "F".equals(user.getGender()) ? "selected" : "" %>>Feminin</option>
+        <option value="male" <%= "male".equals(user.getGender()) ? "selected" : "" %>>Masculin</option>
+        <option value="female" <%= "female".equals(user.getGender()) ? "selected" : "" %>>Feminin</option>
       </select><br>
       <input type="email" name="email" placeholder="Email" value="<%= user.getEmail() %>" readonly required><br>
       <input type="password" name="password" placeholder="Mot de passe" readonly><br>
