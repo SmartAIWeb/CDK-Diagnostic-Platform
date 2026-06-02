@@ -7,12 +7,15 @@
 <header>
   <nav>
     <% if (currentUser != null) { %>
+      <a href="index.jsp">Home</a>
       <a href="controller?request_type=predict">Prédiction</a>
       <a href="controller?request_type=history">Historique</a>
       <a href="controller?request_type=profile">Profil</a>
       <% if (isAdmin) { %><a href="controller?request_type=admin">Administration</a><% } %>
       <a href="controller?request_type=logout">Déconnexion</a>
     <% } else { %>
+      <a href="index.jsp">Home</a>
+      <a href="controller?request_type=predict">Prédiction</a>
       <a href="login.jsp">Connexion</a>
       <a href="register.jsp">Inscription</a>
     <% } %>
