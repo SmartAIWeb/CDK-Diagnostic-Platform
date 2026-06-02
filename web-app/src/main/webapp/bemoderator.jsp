@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 </head>
 <body>
-    <div class="form-container">
+    <div class="form-container" style="margin-top:85px;">
         <h2>Demande de privileges Moderateur</h2>
         <p>Veuillez expliquer pourquoi vous souhaitez devenir modérateur pour notre plateforme :</p>
         
