@@ -17,8 +17,10 @@ services:
       DB_PASSWORD: root
       ML_API_URL: http://ml-api:5000/predict
     depends_on:
-      - db
-      - ml-api
+      db:
+        condition: service_healthy
+      ml-api:
+        condition: service_started
 
   db:
     image: mariadb:11
@@ -32,6 +34,11 @@ services:
       MARIADB_DATABASE: prediction_app_db
     networks:
       - backend
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 10s
+      interval: 5s
+      retries: 5
 
   ml-api:
     build:
