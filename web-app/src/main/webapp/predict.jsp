@@ -1,96 +1,37 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ page import="beans.User" %>
 <%
-  User user = (User) session.getAttribute("user_info");
-  if (user == null) {
-      response.sendRedirect("login.jsp");
-      return;
-  }
+    User user = (User) session.getAttribute("user_info");
+    if (user == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
 %>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Prédiction - Maladie Rénale Chronique</title>
+  <title>Formulaire de Prédiction - MRC</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <%@ include file="header.jsp" %>
 
   <main>
-
-    <div class="hero-section">
-      <div class="hero-section-left">
-        <div class="hero-badge">Système IA · Diagnostic Médical</div>
-        <h1>Chronic Kidney<br><span>Disease</span><br>Prediction</h1>
-        <p>Plateforme intelligente d'aide au diagnostic basée sur des algorithmes de Machine Learning entraînés sur des données cliniques réelles.</p>
-
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-value">97<span>%</span></div>
-            <div class="stat-label">Accuracy</div>
-            <div class="stat-sublabel">Random Forest</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value">400<span>+</span></div>
-            <div class="stat-label">Échantillons</div>
-            <div class="stat-sublabel">Dataset UCI</div>
-          </div>
-          <div class="stat-card">
-            <div class="stat-value">24<span>f</span></div>
-            <div class="stat-label">ML Model</div>
-            <div class="stat-sublabel">Features</div>
-          </div>
-        </div>
-      </div>
-      <div class="hero-section-right">
-        <img
-          src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&q=80"
-          alt="Medical imaging laboratory"
-          onerror="this.style.display='none'"
-        />
-      </div>
-    </div>
-
-    <div class="about-section">
-      <div class="about-image">
-        <img
-          src="https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=600&q=80"
-          alt="Kidney anatomy illustration"
-          onerror="this.src='https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=600&q=80'"
-        />
-      </div>
-      <div class="about-content">
-        <h2>Maladie Rénale<br><span>Chronique</span></h2>
-        <p>
-          La maladie rénale chronique (MRC) est une perte progressive et irréversible des fonctions rénales. Elle touche environ 10% de la population mondiale et constitue un problème de santé publique majeur nécessitant un diagnostic précoce.
-        </p>
-        <p>
-          Ce système utilise un modèle de <strong>Random Forest</strong> entraîné sur 400 dossiers patients avec 24 caractéristiques cliniques issues du <strong>UCI Machine Learning Repository</strong>. Il atteint une précision de <strong>97%</strong> en détectant la MRC à partir de paramètres biologiques et d'antécédents médicaux.
-        </p>
-        <div class="about-tags">
-          <span class="about-tag">Random Forest</span>
-          <span class="about-tag">UCI Dataset</span>
-          <span class="about-tag">24 Features</span>
-          <span class="about-tag">Java EE</span>
-          <span class="about-tag">Python Flask</span>
-          <span class="about-tag">MySQL</span>
-        </div>
-      </div>
-    </div>
-
     <section class="predict-container">
       <h2>Formulaire de Prédiction</h2>
 
+      <%-- Error Handling Feedback --%>
       <% if (request.getAttribute("error_msg") != null) { %>
         <div class="error-message">
           <p><%= request.getAttribute("error_msg") %></p>
         </div>
       <% } %>
 
+      <%-- Machine Learning Model Predictions Feedback --%>
       <%
         Integer predictionValue = (Integer) request.getAttribute("prediction_result");
-        Number  predictionProb  = (Number)  request.getAttribute("prediction_probability");
+        Number   predictionProb  = (Number)  request.getAttribute("prediction_probability");
 
         if (predictionValue != null && predictionProb != null) {
           String resultLabel = (predictionValue == 1)
@@ -99,11 +40,12 @@
           String resultClass = (predictionValue == 1) ? "result-positive" : "result-negative";
       %>
           <div class="prediction-result <%= resultClass %>">
-            <p><strong>Résultat</strong><%= resultLabel %></p>
-            <p><strong>Confiance du modèle</strong><%= predictionProb %>%</p>
+            <p><strong>Résultat : </strong><%= resultLabel %></p>
+            <p><strong>Confiance du modèle : </strong><%= predictionProb %>%</p>
           </div>
       <% } %>
 
+      <%-- Dedicated Analysis Form --%>
       <form action="controller" method="POST" class="predict-form-section">
         <input type="hidden" name="request_type" value="predict">
 
@@ -263,22 +205,6 @@
         </div>
       </form>
     </section>
-
-    <div class="predict-page-footer">
-      <div class="footer-col">
-        <h4>Algorithme</h4>
-        <p><strong>Random Forest Classifier</strong><br>Ensemble de 100 arbres de décision. Précision : 97% sur données de test stratifiées.</p>
-      </div>
-      <div class="footer-col">
-        <h4>Données</h4>
-        <p><strong>UCI CKD Dataset</strong><br>400 patients · 24 attributs cliniques · 2 classes : CKD / notCKD.</p>
-      </div>
-      <div class="footer-col">
-        <h4>Avertissement</h4>
-        <p>Cet outil est à usage <strong>académique uniquement</strong>. Il ne remplace pas un diagnostic médical professionnel.</p>
-      </div>
-    </div>
-
   </main>
 
   <footer data-year="2026"></footer>
