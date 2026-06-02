@@ -67,12 +67,14 @@ public class DAOClass {
 
   public User registerNewUser(User targetInfo)
       throws SQLException {
-    try(ResultSet row = findUserByEmail(targetInfo.getEmail())) {
-      if(!row.next()) {
-        if(insertNewUser(targetInfo))
-          return getUser(targetInfo.getEmail());
-      }
+    try {
+      if(insertNewUser(targetInfo))
+        return getUser(targetInfo.getEmail());
       return null;
+    } catch(SQLException e) {
+      if(e.getErrorCode() == 1062)
+        return null;
+      throw e;
     }
   }
 
