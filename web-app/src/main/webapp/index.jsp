@@ -52,7 +52,7 @@
     <div class="about-section">
       <div class="about-image">
         <img
-          src="https://images.unsplash.com/photo-1530026405186-ed1f139313f8?w=600&q=80"
+          src="https://cdn11.bigcommerce.com/s-pimv2ff7eu/images/stencil/1280x1280/products/5162/15411/gpi-anatomicals-basic-kidney-anatomy-model__28087.1603836206.jpg?c=1"
           alt="Kidney anatomy illustration"
           onerror="this.src='https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=600&q=80'"
         />
