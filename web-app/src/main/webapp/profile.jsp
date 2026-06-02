@@ -13,7 +13,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Mon Profil</title>
-  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 </head>
 <body>
   <%@ include file="header.jsp" %>
@@ -21,6 +21,11 @@
   <main>
     <section class="profile-container">
       <h2>Profil Utilisateur</h2>
+      <% if (request.getAttribute("msg") != null) { %>
+        <div class="succes_message" >
+          <p><%= request.getAttribute("msg") %></p>
+        </div>
+      <% } %>
 
       <% if (request.getAttribute("error_msg") != null) { %>
         <div class="error-message">
@@ -62,7 +67,7 @@
         </div>
       </form>
       <% if (!"admin".equals(user.getRole())) { %>
-          <a href="bemoderator.jsp" class="btn-link">Devenir Moderateur</a>
+          <a href="bemoderator.jsp" class="btn-link" style="margin-top: 10px; display: inline-block;">Devenir Moderateur</a>
       <% } else { %>
           <p style="color: blue;">Vous etes administrateur.</p>
           <a href="controller?request_type=admin" class="btn-link">Accéder au Dashboard Admin</a>
