@@ -451,7 +451,6 @@ button[type="button"]#submitBtn:hover {
   box-shadow: 0 6px 18px rgba(0, 212, 180, 0.25);
 }
 
-/* Messaging Alerts */
 .error-message {
   background-color: rgba(114, 28, 36, 0.2);
   color: #ff8099; 
@@ -474,7 +473,6 @@ button[type="button"]#submitBtn:hover {
   text-align: center;
 }
 
-/* Results Section */
 .prediction-result {
   border-radius: var(--radius);
   padding: 28px 32px;
@@ -552,7 +550,6 @@ button[type="button"]#submitBtn:hover {
   margin-bottom: 2px;
 }
 
-/* Tables Styling */
 .table-container {
   overflow-x: auto;
   border-radius: var(--radius);
@@ -1116,7 +1113,6 @@ footer::after {
   font-weight: 500;
 }
 
-/* Cleanup Content Overrides */
 .btn {
   padding: 8px 16px;
   border: none;
@@ -1145,7 +1141,6 @@ footer::after {
   background-color: #992222;
 }
 
-/* Media Queries */
 @media (max-width: 900px) {
   main { padding: 40px 24px 60px; }
   header { padding: 0 24px; }
