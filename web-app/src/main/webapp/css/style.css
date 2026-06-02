@@ -1213,3 +1213,24 @@ footer::after {
 .btn-reject:hover {
     background-color: #cc0000;
 }
+.succes_message {
+    background-color: rgba(21, 87, 36, 0.2); 
+    color: #55d68d; 
+    border: 1px solid #155724;
+    padding: 15px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 20px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.error-message {
+    background-color: rgba(114, 28, 36, 0.2);
+    color: #ff8099; 
+    border: 1px solid #721c24;
+    padding: 15px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 20px;
+    font-weight: 500;
+    text-align: center;
+}
