@@ -717,7 +717,7 @@ footer {
 }
 
 footer::before {
-  content: 'CKD Prediction System · Projet de Fin d\'Études · ' attr(data-year);
+  content: 'CKD Prediction System · Machine Learning & JEE Application . ' attr(data-year);
   display: block;
   font-family: 'Space Mono', monospace;
   margin-bottom: 8px;
