@@ -66,7 +66,7 @@
           </tbody>
         </table>
       </div>
-      <div class="table-container">
+      <div class="table-container" style="margin-top:20px;">
         <h2>Demandes de Administration en attente</h2>
         <table>
           <thead>
