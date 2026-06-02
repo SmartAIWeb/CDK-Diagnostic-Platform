@@ -36,7 +36,7 @@
         </div>
         
         <div style="margin-top: 40px;">
-          <a href="predict.jsp" class="btn-primary">Saisir les données patient</a>
+          <a href="predict.jsp" class="btn-primary">Commancer</a>
         </div>
       </div>
       
