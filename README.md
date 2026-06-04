@@ -2,8 +2,6 @@
 
 A containerized web application for predicting chronic kidney disease from clinical patient data, built with Java/Tomcat, Python/Flask, and MariaDB.
 
----
-
 ## Overview
 
 Clinicians enter patient lab values through a web form. The application persists the record to MariaDB and forwards it to a Flask microservice, which runs the data through a trained ML model and returns a **CKD / Not CKD** prediction with the stored history viewable per patient.
