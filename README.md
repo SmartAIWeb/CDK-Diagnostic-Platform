@@ -1,23 +1,45 @@
-# JEE Mini Project
+# CKD Diagnostic Platform
 
-Kidney disease prediction app, Tomcat + MariaDB + Flask ML API.
+A containerized web application for predicting chronic kidney disease from clinical patient data, built with Java/Tomcat, Python/Flask, and MariaDB.
 
-## Prerequisites
+---
 
-```bash
-sudo dnf install java-21-openjdk maven docker docker-compose-plugin
-sudo systemctl enable --now docker
-sudo usermod -aG docker $USER
+## Overview
+
+Clinicians enter patient lab values through a web form. The application persists the record to MariaDB and forwards it to a Flask microservice, which runs the data through a trained ML model and returns a **CKD / Not CKD** prediction with the stored history viewable per patient.
+
+## Architecture
+
+```
+Browser ──► jee-tomcat (:8080) ──► jee-ml (:5000)
+                  │
+            jee-db (MariaDB)
 ```
 
-## Run
+| Container    | Technology          | Port |
+|--------------|---------------------|------|
+| `jee-tomcat` | Java 21 + Tomcat    | 8080 |
+| `jee-ml`     | Python 3 + Flask    | 5000 |
+| `jee-db`     | MariaDB 11          | —    |
 
-Build the Java app first:
-```bash
-cd web-app && mvn package && cd ..
-```
+**Startup order** — `jee-tomcat` waits for `jee-db` to pass its health check before starting, preventing connection errors on cold boot.
 
-Then:
+**Hot-swappable models** — ML model files are bind-mounted from `./ml-api/models/` at runtime. Swap in a new model file and restart `jee-ml` without rebuilding the image.
+
+## Screenshots
+
+![Home](https://cdn.jsdelivr.net/gh/SmartAIWeb/CDK-Diagnostic-Platform@main/screenshots/home_1.png)
+![Result](https://cdn.jsdelivr.net/gh/SmartAIWeb/CDK-Diagnostic-Platform@main/screenshots/prediction.png)
+![History](https://cdn.jsdelivr.net/gh/SmartAIWeb/CDK-Diagnostic-Platform@main/screenshots/user_history.png)
+
+## Getting Started
+
+### Prerequisites
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (includes the Compose plugin)
+
+### Run
+
 ```bash
 docker compose up --build
 ```
@@ -27,11 +49,30 @@ docker compose up --build
 | Web app   | http://localhost:8080 |
 | Flask API | http://localhost:5000 |
 
-## Flask API
-Your work is in `ml-api/api/app.py`. 
-Load models from `./models/`, they are mounted there at runtime.
+To stop and remove containers:
 
-After changing `requirements.txt`:
 ```bash
-docker compose build --no-cache ml-api
+docker compose down
 ```
+
+## Project Structure
+
+```
+├── web-app/                  # Jakarta + Tomcat
+├── ml-api/
+│   ├── api/app.py            # Flask prediction endpoint
+│   ├── models/               # Trained model files
+│   └── notebooks/            # Model training notebooks
+├── database/
+│   └── schema.sql            # MariaDB schema
+└── docker-compose.yml
+```
+
+## Tech Stack
+
+| Layer      | Technology |
+|------------|------------|
+| Frontend   | Java 21 · Jakarta Servlets · Apache Tomcat |
+| ML API     | Python · Flask · scikit-learn |
+| Database   | MariaDB 11 |
+| Infra      | Docker · Docker Compose |
